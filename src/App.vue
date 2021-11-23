@@ -1,30 +1,57 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div>
-  <router-view/>
+  <nav-bar />
+  <router-view />
 </template>
 
+<script>
+import { provide, ref, watchEffect } from "@vue/runtime-core";
+import NavBar from "./components/NavBar.vue";
+export default {
+  components: { NavBar },
+  setup() {
+    const user = ref({});
+    provide("user", user);
+    watchEffect(() => console.log(user.value));
+  },
+};
+</script>
+
 <style>
+:root {
+  --color-white: #fafafa;
+  --color-blue: #0052cc;
+  --color-dark: #111111;
+  --color-grey: #888;
+}
+body {
+  margin: 0;
+  background-color: var(--color-white);
+}
+* {
+  box-sizing: border-box;
+}
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  color: var(--color-dark);
+  font-family: "Open Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  /* color: #2c3e50; */
 }
 
-#nav {
-  padding: 30px;
+a {
+  font-weight: 500;
+  color: var(--color-grey);
+  text-decoration: none;
+  font-size: 13px;
+  line-height: 2;
 }
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+a.router-link-exact-active {
+  color: var(--color-dark);
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+.material-icons-outlined {
+  font-size: 18px;
 }
 </style>
