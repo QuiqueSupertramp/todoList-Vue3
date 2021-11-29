@@ -1,15 +1,14 @@
 <template>
   <nav class="nav">
-    <h1>TODO LIST</h1>
+    <router-link class="title" to="/"><h1>TODO LIST</h1></router-link>
     <div class="nav-links" v-if="!user.name">
-      <router-link to="/login">Login</router-link>
       <router-link to="/register" class="btn-register"
-        >Pruebalo gratis!</router-link
+        >Registrarse</router-link
       >
     </div>
     <div v-else class="nav-links">
       <p>Hello {{ user.name }}!</p>
-      <span class="material-icons-outlined"> logout </span>
+      <span class="material-icons-outlined logout" @click="logout"> logout </span>
     </div>
   </nav>
 </template>
@@ -19,7 +18,11 @@ import { inject } from "vue";
 export default {
   setup() {
     let user = inject("user");
-    return { user };
+    let logout = ()=> {
+      let r = confirm("seguro que quieres salir?")
+      r ? user.value = '' : null
+    }
+    return { user, logout };
   },
 };
 </script>
@@ -29,22 +32,35 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 1rem;
+  padding: 0 2rem;
+  background-color: var(--color-blue);
+  height: 9vh;
 }
 
 h1 {
-  color: var(--color-blue);
+  margin: 0;
+}
+.title:hover {
+  color: var(--color-white);
+}
+.title.router-link-exact-active {
+  color: var(--color-white);
 }
 .btn-register {
-  border: 1px solid var(--color-blue);
+  border: 2px solid var(--color-white);
   border-radius: 5px;
-  color: var(--color-blue);
   padding: 0 10px;
-  font-size: 12px;
+}
+.btn-register:hover {
+  border: 2px solid orange;
+  color: var(--color-white);
+  background-color: orange;
 }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
+  color: var(--color-white);
 }
+
 </style>

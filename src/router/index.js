@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Home from '../views/Home.vue'
@@ -11,19 +10,19 @@ const routes = [
     component: Home
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: Login
-  },
-  {
     path: '/register',
     name: 'Register',
     component: Register
   },
   {
-    path: '/dashboard',
+    path: '/dashboard/:user',
     name: 'Dashboard',
-    component: Dashboard
+    component: Dashboard,
+    beforeEnter: (to, from)=> {
+      let user = to.params.user
+      console.log(user)
+      return true
+    }
   }
 ]
 
