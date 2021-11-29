@@ -20,7 +20,7 @@ export default {
     let user = inject("user");
     let logout = ()=> {
       let r = confirm("seguro que quieres salir?")
-      r ? user.value = '' : null
+      r ? (user.value = '', localStorage.removeItem("user")) : null
     }
     return { user, logout };
   },

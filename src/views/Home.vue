@@ -20,7 +20,7 @@
           id="inputName"
           class="loginInputs"
           type="email"
-          v-model="name"
+          v-model="email"
           autocomplete="off"
         />
       </div>
@@ -50,21 +50,34 @@ import { ref, inject, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 export default {
   setup() {
-    let name = ref("");
+    let email = ref("");
     let password = ref("");
     let user = inject("user");
     let router = useRouter();
 
-    name.value = "";
+    email.value = "";
     password.value = "";
 
+    let idUser = localStorage.getItem("user");
+    if (idUser) {
+      // getUserById(idUser)
+      fetch(`http://localhost:3001/api/usuarios/${idUser}`).then(res=> res.json()).then(json=> user.value = json)
+    }
+
+    // let getUserById = async (id) => {
+    //   let data = await fetch(`http://localhost:3001/api/usuarios/${id}`);
+    //   let json = await data.json();
+    //   user.value = json;
+    // };
+
     let loginUser = async () => {
-      let loginError = document.querySelector(".loginError")
-      
+      let loginError = document.querySelector(".loginError");
+
       let loginUser = {
-        email: name.value,
+        email: email.value,
         password: password.value,
       };
+
       let data = await fetch(`http://localhost:3001/api/usuarios/checkUser`, {
         method: "POST",
         headers: {
@@ -76,8 +89,9 @@ export default {
 
       if (data.ok) {
         user.value = json.user;
+        localStorage.setItem("user", user.value._id);
       } else {
-        loginError.classList.remove("off")
+        loginError.classList.remove("off");
       }
     };
 
@@ -100,7 +114,7 @@ export default {
       });
       document.addEventListener("focusout", (e) => {
         if (e.target.matches("#inputName")) {
-          if (name.value == "") {
+          if (email.value == "") {
             nameSpan.classList.remove("span--top");
             nameLogin.classList.remove("login--top");
           }
@@ -118,7 +132,7 @@ export default {
       user.value ? router.push(`/dashboard/${user.value.name}`) : null;
     });
 
-    return { name, password, loginUser };
+    return { email, password, loginUser };
   },
 };
 </script>
