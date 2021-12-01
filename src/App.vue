@@ -1,16 +1,16 @@
 <template>
-  <nav-bar />
-  <router-view />
+  <Suspense>
+    <common-component></common-component>
+  </Suspense>
 </template>
 
 <script>
-import { provide, ref } from "vue";
-import NavBar from "./components/NavBar.vue";
+import CommonComponent from "./components/CommonComponent.vue";
+
 export default {
-  components: { NavBar },
+  components: { CommonComponent },
   setup() {
-    const user = ref({});
-    provide("user", user);
+
   },
 };
 </script>
@@ -21,6 +21,7 @@ export default {
   --color-blue: #1061e6;
   --color-dark: #16233f;
   --color-grey: #a1a7b6;
+  --color-ligthgrey: #f2f2f2;
 }
 body {
   margin: 0;

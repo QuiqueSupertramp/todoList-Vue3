@@ -1,61 +1,89 @@
 <template>
-  <h3>Todo Tasks</h3>
-  <div class="todoTasks" v-for="(task, index) in todoTasks" :key="index">
-    {{ task.name }}
-  </div>
-  <div class="todoTasks" v-for="(task, index) in completedTasks" :key="index">
-    {{ task.name }}
+  <div class="folderView">
+    <div class="folderHeader">
+      <h2>{{ folderName }}</h2>
+      <button @click="deleteFolder">Borrar Carpeta</button>
+    </div>
+    <div class="todoList">
+      <div v-for="(task, index) in todoTasks" :key="index">
+        {{ task.name }}
+      </div>
+    </div>
+    <div class="completedList">
+      <h3>COmpleted</h3>
+      <div v-for="(task, index) in completedTasks" :key="index">
+        {{ task.name }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, watch, inject } from "vue";
+import { inject, ref, watchEffect } from "vue";
 import { useRouter } from "vue-router";
-
 export default {
   setup() {
     let router = useRouter();
-    let completedTasks = ref([]);
+    let folderId = inject("folderId");
+    let AllTasks = inject("AllTasks");
+    let AllFolders = inject("AllFolders");
+
+    let folderName = ref("");
     let todoTasks = ref([]);
-    let id = inject("folderId");
+    let completedTasks = ref([]);
 
-    id.value = router.currentRoute.value.params.folder;
-
-    router.afterEach(() => {
-      id.value = router.currentRoute.value.params.folder;
-    });
-
-    router.beforeEach(() => {
-      todoTasks.value = [];
-    });
-
-    fetch(`http://localhost:3001/api/carpetas/${id.value}`)
-      .then((res) => res.json())
-      .then((json) => {
-        json.tasks.forEach((task) => {
-          task.status === true
-            ? completedTasks.value.push(task)
-            : todoTasks.value.push(task);
-        });
+    let deleteFolder = async () => {
+      let data = await fetch(`http://localhost:3001/api/carpetas/${folderId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+      if (data.ok) {
+        console.log(data);
+        let json = await data.json()
+        console.log(json.data._id)
+        let i = AllFolders.value.map(folder => folder._id).indexOf(json.data._id);
+        i !== -1 && AllFolders.value.splice(i, 1);
+        folderId = "AllTasks";
+        router.push("/dashboard/AllTasks");
+      }
+    };
 
-    console.log(id.value);
+    watchEffect(() => {
+      todoTasks.value = [];
+      completedTasks.value = [];
 
-    watch(id, () => {
-      if (id.value !== "") {
-        fetch(`http://localhost:3001/api/carpetas/${id.value}`)
+      folderId = router.currentRoute.value.params.idFolder;
+
+      if (folderId === "AllTasks") {
+        folderName.value = "All Tasks";
+        AllTasks.value.forEach((task) => {
+          !task.status
+            ? todoTasks.value.push(task)
+            : completedTasks.value.push(task);
+        });
+      } else {
+        fetch(`http://localhost:3001/api/carpetas/${folderId}`)
           .then((res) => res.json())
           .then((json) => {
+            folderName.value = json.name;
             json.tasks.forEach((task) => {
-              task.status === true
-                ? completedTasks.value.push(task)
-                : todoTasks.value.push(task);
+              !task.status
+                ? todoTasks.value.push(task)
+                : completedTasks.value.push(task);
             });
           });
       }
     });
 
-    return { todoTasks, completedTasks };
+    return { todoTasks, completedTasks, folderName, deleteFolder };
   },
 };
 </script>
+
+<style scoped>
+.folderView {
+  margin-left: 300px;
+}
+</style>

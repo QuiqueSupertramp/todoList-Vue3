@@ -1,7 +1,7 @@
 <template>
   <nav class="nav">
     <router-link class="title" to="/"><h1>TODO LIST</h1></router-link>
-    <div class="nav-links" v-if="!user.name">
+    <div class="nav-links" v-if="!user">
       <router-link to="/register" class="btn-register"
         >Registrarse</router-link
       >

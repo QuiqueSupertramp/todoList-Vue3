@@ -46,34 +46,23 @@
 </template>
 
 <script>
-import { ref, inject, onMounted, watch } from "vue";
-import { useRouter } from "vue-router";
+import { ref, inject, onMounted, watchEffect } from "vue";
+import {useRouter} from 'vue-router'
 export default {
   setup() {
+    let router = useRouter()
     let email = ref("");
     let password = ref("");
     let user = inject("user");
-    let router = useRouter();
+
 
     email.value = "";
     password.value = "";
 
-    let idUser = localStorage.getItem("user");
-    if (idUser) {
-      // getUserById(idUser)
-      fetch(`http://localhost:3001/api/usuarios/${idUser}`).then(res=> res.json()).then(json=> user.value = json)
-    }
-
-    // let getUserById = async (id) => {
-    //   let data = await fetch(`http://localhost:3001/api/usuarios/${id}`);
-    //   let json = await data.json();
-    //   user.value = json;
-    // };
-
     let loginUser = async () => {
       let loginError = document.querySelector(".loginError");
 
-      let loginUser = {
+      let userData = {
         email: email.value,
         password: password.value,
       };
@@ -83,7 +72,7 @@ export default {
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(loginUser),
+        body: JSON.stringify(userData),
       });
       let json = await data.json();
 
@@ -96,7 +85,6 @@ export default {
     };
 
     onMounted(() => {
-      user.value = "";
       let nameLogin = document.querySelector(".nameLogin");
       let nameSpan = document.querySelector(".nameSpan");
       let passwordLogin = document.querySelector(".passwordLogin");
@@ -128,9 +116,11 @@ export default {
       });
     });
 
-    watch(user, () => {
-      user.value ? router.push(`/dashboard/${user.value.name}`) : null;
-    });
+    watchEffect(()=> {
+      user.value ? router.push(`/dashboard/AllTasks`) : router.push("/")
+    })
+
+
 
     return { email, password, loginUser };
   },

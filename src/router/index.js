@@ -17,22 +17,11 @@ const routes = [
   },
   {
     path: '/dashboard',
-    name: 'Dashboard2',
-    component: Home
-  },
-  {
-    path: '/dashboard/:user',
     name: 'Dashboard',
-    props: true,
     component: Dashboard,
-    // beforeEnter: (to, from)=> {
-    //   let user = to.params.user
-    //   console.log(user)
-    //   return true
-    // },
     children: [
       {
-        path: ':folder',
+        path: '/dashboard/:idFolder',
         name: 'Folder',
         component: Folder
       }
