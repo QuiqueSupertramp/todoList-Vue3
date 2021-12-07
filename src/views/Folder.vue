@@ -1,89 +1,97 @@
 <template>
   <div class="folderView">
-    <div class="folderHeader">
-      <h2>{{ folderName }}</h2>
-      <button @click="deleteFolder">Borrar Carpeta</button>
-    </div>
+    <folder-header />
     <div class="todoList">
-      <div v-for="(task, index) in todoTasks" :key="index">
-        {{ task.name }}
+      <div v-for="(task, index) in currentFolder.todoTasks" :key="index">
+        <p>{{ task.name }}</p>
+        <span class="material-icons-outlined"> highlight_off </span>
       </div>
     </div>
     <div class="completedList">
-      <h3>COmpleted</h3>
-      <div v-for="(task, index) in completedTasks" :key="index">
-        {{ task.name }}
+      <h3>Completed</h3>
+      <div v-for="(task, index) in currentFolder.completedTasks" :key="index">
+        <p>{{ task.name }}</p>
+        <span class="material-icons-outlined"> highlight_off </span>
       </div>
     </div>
+    <input-task v-if="currentFolder.data.name !== 'All Tasks'" />
   </div>
 </template>
 
 <script>
-import { inject, ref, watchEffect } from "vue";
+import { inject, ref, watchEffect, provide, reactive, computed } from "vue";
 import { useRouter } from "vue-router";
+import inputTask from "../components/inputTask.vue";
+import FolderHeader from '../components/folder/folderHeader.vue';
 export default {
+  components: { inputTask, FolderHeader },
   setup() {
     let router = useRouter();
     let folderId = inject("folderId");
     let AllTasks = inject("AllTasks");
     let AllFolders = inject("AllFolders");
+    let user = inject("user");
+    let currentFolder = inject("currentFolder");
+    let getUser = inject("getUser");
 
     let folderName = ref("");
     let todoTasks = ref([]);
     let completedTasks = ref([]);
 
-    let deleteFolder = async () => {
-      let data = await fetch(`http://localhost:3001/api/carpetas/${folderId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (data.ok) {
-        console.log(data);
-        let json = await data.json()
-        console.log(json.data._id)
-        let i = AllFolders.value.map(folder => folder._id).indexOf(json.data._id);
-        i !== -1 && AllFolders.value.splice(i, 1);
-        folderId = "AllTasks";
-        router.push("/dashboard/AllTasks");
+    provide("todoTasks", todoTasks);
+    provide("completedTasks", completedTasks);
+
+    let getCurrentFolder = async () => {
+      folderId = router.currentRoute.value.params.idFolder;
+      console.log(folderId);
+
+      currentFolder.todoTasks = [];
+      currentFolder.completedTasks = [];
+
+      if (folderId === "AllTasks") {
+        currentFolder.data = { name: "All Tasks" };
+        AllTasks.value.forEach((task) => {
+          !task.status
+            ? currentFolder.todoTasks.push(task)
+            : currentFolder.completedTasks.push(task);
+        });
+      } else {
+        try {
+          let data = await fetch(
+            `http://localhost:3001/api/carpetas/${folderId}`
+          );
+          let json = await data.json();
+          currentFolder.data = json;
+          json.tasks.forEach((task) => {
+            !task.status
+              ? currentFolder.todoTasks.push(task)
+              : currentFolder.completedTasks.push(task);
+          });
+        } catch (error) {
+          console.log(error);
+        }
       }
     };
 
-    watchEffect(() => {
-      todoTasks.value = [];
-      completedTasks.value = [];
-
+    watchEffect(async () => {
       folderId = router.currentRoute.value.params.idFolder;
-
-      if (folderId === "AllTasks") {
-        folderName.value = "All Tasks";
-        AllTasks.value.forEach((task) => {
-          !task.status
-            ? todoTasks.value.push(task)
-            : completedTasks.value.push(task);
-        });
-      } else {
-        fetch(`http://localhost:3001/api/carpetas/${folderId}`)
-          .then((res) => res.json())
-          .then((json) => {
-            folderName.value = json.name;
-            json.tasks.forEach((task) => {
-              !task.status
-                ? todoTasks.value.push(task)
-                : completedTasks.value.push(task);
-            });
-          });
-      }
+      await getCurrentFolder();
     });
 
-    return { todoTasks, completedTasks, folderName, deleteFolder };
+    return {
+      folderId,
+      todoTasks,
+      completedTasks,
+      folderName,
+      currentFolder,
+    };
   },
 };
 </script>
 
 <style scoped>
 .folderView {
-  margin-left: 300px;
+  margin-left: 350px;
+  margin-top: 2rem;
 }
 </style>

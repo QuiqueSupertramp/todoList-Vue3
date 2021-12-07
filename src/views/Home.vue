@@ -47,14 +47,14 @@
 
 <script>
 import { ref, inject, onMounted, watchEffect } from "vue";
-import {useRouter} from 'vue-router'
+import { useRouter } from "vue-router";
 export default {
   setup() {
-    let router = useRouter()
+    let router = useRouter();
     let email = ref("");
     let password = ref("");
     let user = inject("user");
-
+    let getUser = inject("getUser");
 
     email.value = "";
     password.value = "";
@@ -75,11 +75,13 @@ export default {
         body: JSON.stringify(userData),
       });
       let json = await data.json();
+      console.log(json)
 
       if (data.ok) {
-        user.value = json.user;
-        localStorage.setItem("user", user.value._id);
+        user.data = json.user;
+        localStorage.setItem("user", user.data._id);
       } else {
+        user.data = "";
         loginError.classList.remove("off");
       }
     };
@@ -116,11 +118,10 @@ export default {
       });
     });
 
-    watchEffect(()=> {
-      user.value ? router.push(`/dashboard/AllTasks`) : router.push("/")
-    })
-
-
+    watchEffect(() => {
+      // user.data == '' ? router.push("/") : router.push('/dashboard/AllTasks')
+      user.data.name ? router.push("/dashboard/AllTasks") : null;
+    });
 
     return { email, password, loginUser };
   },

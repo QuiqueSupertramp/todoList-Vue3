@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { inject, ref, provide } from "vue";
+import { inject, ref, provide, reactive } from "vue";
 import { useRouter } from "vue-router";
 import SideBar from "../components/SideBar.vue";
 
@@ -17,23 +17,15 @@ export default {
     let router = useRouter();
     let user = inject("user");
     let folderId = ref("AllTasks");
-    let AllTasks = ref([]);
-    let AllFolders = ref([]);
-
-    folderId = router.currentRoute.value.params.idFolder;
-
+    const currentFolder = reactive({
+      data: {},
+      todoTasks: [],
+      completedTasks: [],
+    });
+    provide("currentFolder", currentFolder);
     provide("folderId", folderId);
-    provide("AllTasks", AllTasks);
-    provide("AllFolders", AllFolders);
 
-    if (user.value) {
-      user.value.tasks.forEach((task) => {
-        AllTasks.value.push(task);
-      });
-    }
 
-    let todoTasks = [];
-    let completedTasks = [];
   },
 };
 </script>

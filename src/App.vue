@@ -21,7 +21,7 @@ export default {
   --color-blue: #1061e6;
   --color-dark: #16233f;
   --color-grey: #a1a7b6;
-  --color-ligthgrey: #f2f2f2;
+  --color-ligthgrey: #f5f5f5;
 }
 body {
   margin: 0;
