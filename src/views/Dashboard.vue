@@ -24,10 +24,13 @@ export default {
     });
     provide("currentFolder", currentFolder);
     provide("folderId", folderId);
-
-
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.dashboard {
+  margin-left: 350px;
+  margin-right: 50px;
+}
+</style>

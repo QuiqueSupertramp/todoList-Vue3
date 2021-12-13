@@ -31,6 +31,37 @@ export const deleteFolderById = async (folderId) => {
   }
 };
 
+export const deleteTaskById = async (taskId) => {
+  try {
+    let data = await fetch(`http://localhost:3001/api/tareas/${taskId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    let json = data.json();
+    return json;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateTask = async (taskId, body) => {
+  try {
+    let data = await fetch(`http://localhost:3001/api/tareas/${taskId}`, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    })
+    let json = await data.json()
+    return json
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 // export const comprobarLocalStorage = async () => {
 //   let userStorageId = localStorage.getItem("user");
 //   let data = {};

@@ -40,9 +40,15 @@ export default {
 </script>
 
 <style scoped>
+h2 {
+    margin: 0;
+}
 .folderHeader {
+    padding-bottom: 5px;
+    /* border-bottom: 1px solid #f0f0f0; */
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
 }
 </style>

@@ -1,5 +1,10 @@
 <template>
-  <form @submit.prevent="addFolder()" id="folderForm">
+  <form
+    @submit.prevent="addFolder()"
+    id="folderForm"
+    @mouseenter="mouseOn"
+    @mouseleave="mouseOut"
+  >
     <input class="inputIcon" type="submit" value="+" />
     <input
       @focus="focusOn"
@@ -7,6 +12,7 @@
       type="text"
       placeholder="Añadir carpeta"
       v-model="newFolderName"
+      class="inputNewFolderName"
     />
   </form>
 </template>
@@ -23,22 +29,31 @@ export default {
     let data = "";
 
     let focusOn = (e) => {
-      document.querySelector(".inputIcon").style.color = "var(--color-grey)";
-      document.querySelector(".inputIcon").style.opacity = "1";
-      e.target.placeholder = "Nombre carpeta";
-      e.target.style.fontStyle = "italic"
-      document.getElementById("folderForm").style.backgroundColor = "#ebebeb";
-
+      document.getElementById("folderForm").style.border =
+        "2px solid var(--color-mediumgrey)";
     };
 
     let focusOut = (e) => {
-      document.querySelector(".inputIcon").style.color = "var(--color-blue)";
-      document.querySelector(".inputIcon").style.opacity = ".8";
-      if (e.target.value !== "") {return} 
-      e.target.placeholder = "Añadir carpeta";
-      e.target.style.fontStyle = "normal"
-      document.getElementById("folderForm").style.backgroundColor = "transparent";
+      document.getElementById("folderForm").style.border =
+        "2px solid transparent";
+      e.target.parentElement.firstElementChild.style.backgroundColor = "var(--color-ligthgrey)";
+      e.target.value = "";
+    };
 
+    let mouseOn = (e) => {
+      if (document.activeElement.matches(".inputNewFolderName")) {
+        return;
+      }
+      e.target.firstElementChild.style.backgroundColor =
+        "var(--color-mediumgrey)";
+    };
+
+    let mouseOut = (e) => {
+      if (document.activeElement.matches(".inputNewFolderName")) {
+        return;
+      }
+      e.target.firstElementChild.style.backgroundColor =
+        "var(--color-ligthgrey)";
     };
 
     let addFolder = async () => {
@@ -63,7 +78,7 @@ export default {
       }
     };
 
-    return { newFolderName, addFolder, focusOn, focusOut };
+    return { newFolderName, addFolder, focusOn, focusOut, mouseOn, mouseOut };
   },
 };
 </script>
@@ -74,19 +89,21 @@ form {
   align-items: center;
   padding: 8px 10px;
   border-radius: 5px;
+  border: 2px solid transparent;
 }
 input {
   padding: 0;
 }
 
 .inputIcon {
+  border-radius: 50%;
   width: 24px;
+  height: 24px;
   padding: 0;
   font-size: 22px;
   font-weight: bold;
   line-height: 1;
   color: var(--color-blue);
-  opacity: .9;
   margin-right: 0.7rem;
 }
 </style>

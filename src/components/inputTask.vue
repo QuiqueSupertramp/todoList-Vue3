@@ -1,7 +1,14 @@
 <template>
-  <form @submit.prevent="addTask">
-    <input type="text" v-model="newTaskName" />
-    <input type="submit" value="Agregar Tarea" />
+  <form @submit.prevent="addTask" id="taskForm" @mouseenter="mouseOn" @mouseleave="mouseOut">
+    <input class="inputIcon" type="submit" value="+" />
+    <input
+      type="text"
+      class="inputNewTaskName"
+      v-model="newTaskName"
+      placeholder="Añadir tarea"
+      @focus="focusOn"
+      @focusout="focusOut"
+    />
   </form>
 </template>
 
@@ -19,6 +26,31 @@ export default {
     let todoTasks = inject("todoTasks");
     const currentFolder = inject("currentFolder");
     const getUser = inject("getUser");
+
+    let focusOn = (e) => {
+      document.getElementById("taskForm").style.border =
+        "2px solid var(--color-mediumgrey)";      
+    };
+
+    let focusOut = (e) => {
+      document.getElementById("taskForm").style.border =
+        "2px solid var(--color-white)";
+      e.target.parentElement.firstElementChild.style.backgroundColor =
+        "var(--color-white)";
+      e.target.value = "";
+    };
+
+    let mouseOn = (e) => {
+      e.target.firstElementChild.style.backgroundColor =
+        "var(--color-mediumgrey)";
+    };
+
+    let mouseOut = (e) => {
+      if (document.activeElement.matches(".inputNewTaskName")) {
+        return;
+      }
+      e.target.firstElementChild.style.backgroundColor = "var(--color-white)";
+    };
 
     let addTask = async () => {
       let data = {
@@ -49,7 +81,35 @@ export default {
     //   folderId = router.currentRoute.value.params.idFolder;
     // });
 
-    return { newTaskName, addTask };
+    return { newTaskName, addTask, mouseOn, mouseOut, focusOn, focusOut };
   },
 };
 </script>
+
+<style scoped>
+form {
+  height: 45px;
+  display: flex;
+  align-items: center;
+  padding: 0 0.4rem;
+  border-radius: 5px;
+  border: 2px solid var(--color-white);
+  width: 100%;
+  min-width: fit-content;
+}
+
+input {
+  width: calc(100% - 48px);
+}
+
+.inputIcon {
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1;
+  color: var(--color-blue);
+}
+</style>

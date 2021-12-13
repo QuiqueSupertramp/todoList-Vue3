@@ -36,7 +36,8 @@ export default {
   align-items: center;
   padding: 0 2rem;
   background-color: var(--color-blue);
-  height: 9vh;
+  height: 8vh;
+  margin-bottom: 2rem;
 }
 
 h1 {
@@ -54,9 +55,9 @@ h1 {
   padding: 0 10px;
 }
 .btn-register:hover {
-  border: 2px solid orange;
+  border: 2px solid var(--color-orange);
   color: var(--color-white);
-  background-color: orange;
+  background-color: var(--color-orange);
 }
 .nav-links {
   display: flex;

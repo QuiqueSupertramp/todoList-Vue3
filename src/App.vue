@@ -18,10 +18,12 @@ export default {
 <style>
 :root {
   --color-white: #fafafa;
-  --color-blue: #1061e6;
+  --color-blue: #0066ff;
   --color-dark: #16233f;
   --color-grey: #a1a7b6;
+  --color-mediumgrey: #cccccc;
   --color-ligthgrey: #f5f5f5;
+  --color-orange: #F7B859;
 }
 body {
   margin: 0;
@@ -31,12 +33,12 @@ body {
   box-sizing: border-box;
 }
 h1 {
-  font-size: 2em;
+  font-size: 1.8em;
 }
 #app {
   color: var(--color-dark);
   font-family: "Open Sans", sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

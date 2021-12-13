@@ -115,11 +115,11 @@ a.router-link-exact-active {
 .folderList {
   background-color: var(--color-ligthgrey);
   width: 300px;
-  height: 91vh;
+  height: 92vh;
   position: fixed;
-  top: 9vh;
+  top: 8vh;
   left: 0;
-  padding: 1.5rem;
+  padding: 1.8rem 1.5rem;
 }
 
 .folder {

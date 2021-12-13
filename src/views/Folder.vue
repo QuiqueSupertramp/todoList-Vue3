@@ -1,30 +1,31 @@
 <template>
   <div class="folderView">
     <folder-header />
-    <div class="todoList">
-      <div v-for="(task, index) in currentFolder.todoTasks" :key="index">
-        <p>{{ task.name }}</p>
-        <span class="material-icons-outlined"> highlight_off </span>
+      <div class="taskItem" v-for="(task, index) in currentFolder.todoTasks" :key="index">
+        <folder-item :task="task" />
       </div>
-    </div>
+    <input-task v-if="currentFolder.data.name !== 'All Tasks'" />
     <div class="completedList">
       <h3>Completed</h3>
-      <div v-for="(task, index) in currentFolder.completedTasks" :key="index">
-        <p>{{ task.name }}</p>
-        <span class="material-icons-outlined"> highlight_off </span>
+      <div
+        class="taskItem"
+        v-for="(task, index) in currentFolder.completedTasks"
+        :key="index"
+      >
+        <folder-item :task="task" />
       </div>
     </div>
-    <input-task v-if="currentFolder.data.name !== 'All Tasks'" />
   </div>
 </template>
 
 <script>
-import { inject, ref, watchEffect, provide, reactive, computed } from "vue";
+import { inject, ref, watchEffect, provide } from "vue";
 import { useRouter } from "vue-router";
 import inputTask from "../components/inputTask.vue";
-import FolderHeader from '../components/folder/folderHeader.vue';
+import FolderHeader from "../components/folder/folderHeader.vue";
+import FolderItem from "../components/folder/folderItem.vue";
 export default {
-  components: { inputTask, FolderHeader },
+  components: { inputTask, FolderHeader, FolderItem },
   setup() {
     let router = useRouter();
     let folderId = inject("folderId");
@@ -43,7 +44,6 @@ export default {
 
     let getCurrentFolder = async () => {
       folderId = router.currentRoute.value.params.idFolder;
-      console.log(folderId);
 
       currentFolder.todoTasks = [];
       currentFolder.completedTasks = [];
@@ -73,6 +73,8 @@ export default {
       }
     };
 
+    provide("getCurrentFolder", getCurrentFolder)
+
     watchEffect(async () => {
       folderId = router.currentRoute.value.params.idFolder;
       await getCurrentFolder();
@@ -91,7 +93,21 @@ export default {
 
 <style scoped>
 .folderView {
-  margin-left: 350px;
-  margin-top: 2rem;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+.taskItem {
+  height: 45px;
+  padding: 0 .4rem;
+  border: 2px solid var(--color-white);
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+}
+
+input {
+  font-size: 15px;
 }
 </style>

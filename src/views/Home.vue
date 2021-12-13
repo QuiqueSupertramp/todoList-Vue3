@@ -80,6 +80,7 @@ export default {
       if (data.ok) {
         user.data = json.user;
         localStorage.setItem("user", user.data._id);
+        getUser()
       } else {
         user.data = "";
         loginError.classList.remove("off");
@@ -120,7 +121,7 @@ export default {
 
     watchEffect(() => {
       // user.data == '' ? router.push("/") : router.push('/dashboard/AllTasks')
-      user.data.name ? router.push("/dashboard/AllTasks") : null;
+      user.data ? router.push("/dashboard/AllTasks") : null;
     });
 
     return { email, password, loginUser };
