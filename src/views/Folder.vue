@@ -1,9 +1,21 @@
 <template>
   <div class="folderView">
+    <div class="loading" v-if="loading === true">
+      <img src="../assets/logo.png" alt="" />
+    </div>
     <folder-header />
-      <div class="taskItem" v-for="(task, index) in currentFolder.todoTasks" :key="index">
+    <div v-if="currentFolder.todoTasks.length > 0">
+      <div
+        class="taskItem"
+        v-for="(task, index) in currentFolder.todoTasks"
+        :key="index"
+      >
         <folder-item :task="task" />
       </div>
+    </div>
+    <div v-else-if="(currentFolder.todoTasks.length = 0)">
+      <p>No hay tareas pendientes</p>
+    </div>
     <input-task v-if="currentFolder.data.name !== 'All Tasks'" />
     <div class="completedList">
       <h3>Completed</h3>
@@ -19,11 +31,12 @@
 </template>
 
 <script>
-import { inject, ref, watchEffect, provide } from "vue";
+import { inject, ref, watchEffect, provide, computed } from "vue";
 import { useRouter } from "vue-router";
 import inputTask from "../components/inputTask.vue";
 import FolderHeader from "../components/folder/folderHeader.vue";
 import FolderItem from "../components/folder/folderItem.vue";
+
 export default {
   components: { inputTask, FolderHeader, FolderItem },
   setup() {
@@ -39,10 +52,13 @@ export default {
     let todoTasks = ref([]);
     let completedTasks = ref([]);
 
+    let loading = false;
+
     provide("todoTasks", todoTasks);
     provide("completedTasks", completedTasks);
 
     let getCurrentFolder = async () => {
+      loading = true;
       folderId = router.currentRoute.value.params.idFolder;
 
       currentFolder.todoTasks = [];
@@ -60,6 +76,7 @@ export default {
           let data = await fetch(
             `http://localhost:3001/api/carpetas/${folderId}`
           );
+          console.log(data)
           let json = await data.json();
           currentFolder.data = json;
           json.tasks.forEach((task) => {
@@ -71,9 +88,10 @@ export default {
           console.log(error);
         }
       }
+      loading = false
     };
 
-    provide("getCurrentFolder", getCurrentFolder)
+    provide("getCurrentFolder", getCurrentFolder);
 
     watchEffect(async () => {
       folderId = router.currentRoute.value.params.idFolder;
@@ -86,6 +104,7 @@ export default {
       completedTasks,
       folderName,
       currentFolder,
+      loading
     };
   },
 };
@@ -95,11 +114,12 @@ export default {
 .folderView {
   margin: 0 auto;
   max-width: 800px;
+  position: relative;
 }
 
 .taskItem {
   height: 45px;
-  padding: 0 .4rem;
+  padding: 0 0.4rem;
   border: 2px solid var(--color-white);
   border-bottom: 1px solid #f0f0f0;
   display: flex;
@@ -109,5 +129,12 @@ export default {
 
 input {
   font-size: 15px;
+}
+
+.loading {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
 }
 </style>

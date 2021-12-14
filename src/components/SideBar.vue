@@ -9,7 +9,7 @@
       </div>
       <div class="folderItemText">
         <p>Show all Tasks</p>
-        <span>{{ AllTasks.length }}</span>
+        <span>{{ AllTodoTasks.length }}</span>
       </div>
     </router-link>
     <div>
@@ -33,7 +33,7 @@
           </div>
           <div class="folderItemText">
             <p>{{ folder.name }}</p>
-            <span>{{ folder.tasks.length }}</span>
+            <span>{{ folder.tasks.filter((task)=> task.status === false).length }}</span>
           </div>
         </router-link>
         <div class="itemOptions">
@@ -61,6 +61,7 @@ export default {
     let router = useRouter();
     let AllFolders = inject("AllFolders");
     let AllTasks = inject("AllTasks");
+    let AllTodoTasks = inject("AllTodoTasks");
     let getUser = inject("getUser");
 
     let deleteFolder = async (folder) => {
@@ -95,7 +96,7 @@ export default {
       e.target.firstElementChild.style.backgroundColor = "inherit";
     };
 
-    return { AllFolders, AllTasks, mouseEnter, mouseLeave, deleteFolder };
+    return { AllFolders, AllTasks, AllTodoTasks, mouseEnter, mouseLeave, deleteFolder };
   },
 };
 </script>

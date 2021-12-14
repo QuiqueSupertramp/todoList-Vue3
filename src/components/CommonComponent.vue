@@ -29,10 +29,14 @@ export default {
     });
     const AllTasks = ref([]);
     const AllFolders = ref([]);
+    const AllTodoTasks = computed(() => {
+      return AllTasks.value.filter((task) => task.status === false);
+    });
 
     provide("user", user);
     provide("AllTasks", AllTasks);
     provide("AllFolders", AllFolders);
+    provide("AllTodoTasks", AllTodoTasks);
 
     let getUser = async () => {
       let res = await getUserById();
@@ -52,6 +56,7 @@ export default {
 
     watchEffect(async () => {
       await getUser();
+
       // user.data = '' ? router.push("/") : null;
     });
   },

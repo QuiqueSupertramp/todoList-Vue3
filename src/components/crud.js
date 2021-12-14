@@ -11,8 +11,8 @@ export const getUserById = async () => {
       );
       const json = data.json();
       return json;
-    } catch (error) {}
-    console.log(error);
+    } catch (error) {console.log(error)}
+    
   }
 };
 
