@@ -5,7 +5,7 @@
       <router-link to="/register" class="btn-register">Registrarse</router-link>
     </div>
     <div v-else class="nav-links">
-      <p>Hello {{ user.data.name }}!</p>
+      <p>Hola {{ user.data.name }}!</p>
       <span class="material-icons-outlined logout" @click="logout">
         logout
       </span>
@@ -29,7 +29,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .nav {
   display: flex;
   justify-content: space-between;
@@ -64,5 +64,13 @@ h1 {
   align-items: center;
   gap: 1rem;
   color: var(--color-white);
+}
+
+.nav-links p {
+  font-weight: bold;
+}
+
+.logout {
+  color: var(--color-white)
 }
 </style>

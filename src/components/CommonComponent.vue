@@ -1,4 +1,7 @@
 <template>
+  <div v-if="loading === true" class="loader">
+    <div class="spinner"></div>
+  </div>
   <nav-bar />
   <router-view />
 </template>
@@ -38,14 +41,19 @@ export default {
     provide("AllFolders", AllFolders);
     provide("AllTodoTasks", AllTodoTasks);
 
+    let loading = ref(false);
+
     let getUser = async () => {
+      loading.value = true;
       let res = await getUserById();
       if (res !== undefined) {
         user.data = res;
         AllFolders.value = user.data.folders;
         AllTasks.value = user.data.tasks;
+        loading.value = false;
       } else {
         user.data = "";
+        loading.value = false;
         router.push("/");
       }
     };
@@ -56,9 +64,40 @@ export default {
 
     watchEffect(async () => {
       await getUser();
-
-      // user.data = '' ? router.push("/") : null;
     });
+
+    return { loading };
   },
 };
 </script>
+
+<style>
+.loader {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #fafafabb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid transparent;
+  border-radius: 50%;
+  border-left: 4px solid var(--color-blue);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>

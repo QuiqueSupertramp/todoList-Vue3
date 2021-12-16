@@ -42,7 +42,7 @@ export default {
 
     let mouseOn = (e) => {
       e.target.firstElementChild.style.backgroundColor =
-        "var(--color-mediumgrey)";
+        "var(--color-ligthgrey)";
     };
 
     let mouseOut = (e) => {
@@ -52,14 +52,14 @@ export default {
       e.target.firstElementChild.style.backgroundColor = "var(--color-white)";
     };
 
-    let addTask = async () => {
+    let addTask = async (e) => {
       let data = {
         name: newTaskName.value,
         folder: currentFolder.data._id,
         user: user.data._id,
       };
 
-      let fetchData = await fetch("http://localhost:3001/api/tareas", {
+      let fetchData = await fetch("https://apiserver-todolist.herokuapp.com/api/tareas", {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -73,6 +73,7 @@ export default {
         currentFolder.todoTasks.push(json);
         currentFolder.data.tasks.push(json);
         newTaskName.value = "";
+        e.target.lastElementChild.blur()
         await getUser();
       }
     };

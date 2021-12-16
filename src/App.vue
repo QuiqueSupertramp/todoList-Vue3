@@ -19,6 +19,7 @@ export default {
 :root {
   --color-white: #fafafa;
   --color-blue: #0066ff;
+  --color-mediumblue: #62a1ffbb;
   --color-dark: #16233f;
   --color-grey: #a1a7b6;
   --color-mediumgrey: #cccccc;
@@ -31,10 +32,13 @@ body {
 }
 * {
   box-sizing: border-box;
+  word-break: break-all;
+
 }
 h1 {
   font-size: 1.8em;
 }
+
 #app {
   color: var(--color-dark);
   font-family: "Open Sans", sans-serif;
@@ -69,6 +73,7 @@ input {
   background-color: transparent;
   color: var(--color-black);
 }
+
 
 .material-icons-outlined {
   font-size: 20px;

@@ -1,31 +1,27 @@
 <template>
   <div class="folderView">
-    <div class="loading" v-if="loading === true">
-      <img src="../assets/logo.png" alt="" />
+    <div class="loader" v-if="loading === true">
+      <div class="spinner"></div>
     </div>
     <folder-header />
     <div v-if="currentFolder.todoTasks.length > 0">
-      <div
-        class="taskItem"
+      <folder-item
+        :task="task"
         v-for="(task, index) in currentFolder.todoTasks"
         :key="index"
-      >
-        <folder-item :task="task" />
-      </div>
+      />
     </div>
-    <div v-else-if="(currentFolder.todoTasks.length = 0)">
+    <div v-else>
       <p>No hay tareas pendientes</p>
     </div>
     <input-task v-if="currentFolder.data.name !== 'All Tasks'" />
     <div class="completedList">
       <h3>Completed</h3>
-      <div
-        class="taskItem"
-        v-for="(task, index) in currentFolder.completedTasks"
-        :key="index"
-      >
-        <folder-item :task="task" />
-      </div>
+        <folder-item
+          :task="task"
+          v-for="(task, index) in currentFolder.completedTasks"
+          :key="index"
+        />
     </div>
   </div>
 </template>
@@ -43,22 +39,18 @@ export default {
     let router = useRouter();
     let folderId = inject("folderId");
     let AllTasks = inject("AllTasks");
-    let AllFolders = inject("AllFolders");
-    let user = inject("user");
     let currentFolder = inject("currentFolder");
-    let getUser = inject("getUser");
 
     let folderName = ref("");
     let todoTasks = ref([]);
     let completedTasks = ref([]);
-
-    let loading = false;
+    let loading = ref(false);
 
     provide("todoTasks", todoTasks);
     provide("completedTasks", completedTasks);
 
     let getCurrentFolder = async () => {
-      loading = true;
+      loading.value = true;
       folderId = router.currentRoute.value.params.idFolder;
 
       currentFolder.todoTasks = [];
@@ -71,12 +63,12 @@ export default {
             ? currentFolder.todoTasks.push(task)
             : currentFolder.completedTasks.push(task);
         });
+        loading.value = false;
       } else {
         try {
           let data = await fetch(
-            `http://localhost:3001/api/carpetas/${folderId}`
+            `https://apiserver-todolist.herokuapp.com/api/carpetas/${folderId}`
           );
-          console.log(data)
           let json = await data.json();
           currentFolder.data = json;
           json.tasks.forEach((task) => {
@@ -86,9 +78,10 @@ export default {
           });
         } catch (error) {
           console.log(error);
+        } finally {
+          loading.value = false;
         }
       }
-      loading = false
     };
 
     provide("getCurrentFolder", getCurrentFolder);
@@ -104,7 +97,7 @@ export default {
       completedTasks,
       folderName,
       currentFolder,
-      loading
+      loading,
     };
   },
 };
@@ -117,24 +110,11 @@ export default {
   position: relative;
 }
 
-.taskItem {
-  height: 45px;
-  padding: 0 0.4rem;
-  border: 2px solid var(--color-white);
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  align-items: center;
-  border-radius: 5px;
-}
-
 input {
   font-size: 15px;
 }
 
-.loading {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-color: #fff;
+.completedList {
+  margin-top: 2rem;
 }
 </style>

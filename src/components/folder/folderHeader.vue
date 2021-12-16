@@ -1,12 +1,13 @@
 <template>
   <div class="folderHeader">
     <h2>{{ currentFolder.data.name }}</h2>
-    <button
+    <img
+      src="@/assets/delete.png"
+      alt="Borrar carpeta"
+      title="Borrar carpeta"
       v-if="currentFolder.data.name !== 'All Tasks'"
       @click="deleteFolder"
-    >
-      Borrar Carpeta
-    </button>
+    />
   </div>
 </template>
 
@@ -29,9 +30,12 @@ export default {
     let currentFolder = inject("currentFolder");
 
     let deleteFolder = async () => {
-      await deleteFolderById(currentFolder.data._id);
-      await getUser();
-      router.push("/dashboard/AllTasks");
+      let r = confirm("Deseas borrar esta carpeta");
+      if (r) {
+        await deleteFolderById(currentFolder.data._id);
+        await getUser();
+        router.push("/dashboard/AllTasks");
+      }
     };
 
     return { deleteFolder, currentFolder };
@@ -41,14 +45,22 @@ export default {
 
 <style scoped>
 h2 {
-    margin: 0;
+  margin: 0;
 }
+
+h2::first-letter {
+  text-transform: uppercase;
+}
+
 .folderHeader {
-    padding-bottom: 5px;
-    /* border-bottom: 1px solid #f0f0f0; */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
+  padding-bottom: 5px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 2rem;
+}
+
+img {
+  width: 24px;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <form
-    @submit.prevent="addFolder()"
+    @submit.prevent="addFolder"
     id="folderForm"
     @mouseenter="mouseOn"
     @mouseleave="mouseOut"
@@ -45,7 +45,7 @@ export default {
         return;
       }
       e.target.firstElementChild.style.backgroundColor =
-        "var(--color-mediumgrey)";
+        "#ebebeb";
     };
 
     let mouseOut = (e) => {
@@ -56,12 +56,12 @@ export default {
         "var(--color-ligthgrey)";
     };
 
-    let addFolder = async () => {
+    let addFolder = async (e) => {
       data = {
         name: newFolderName.value,
         user: user.data._id,
       };
-      let fetchData = await fetch("http://localhost:3001/api/carpetas", {
+      let fetchData = await fetch("https://apiserver-todolist.herokuapp.com/api/carpetas", {
         method: "POST",
         body: JSON.stringify(data),
         headers: {
@@ -75,6 +75,7 @@ export default {
         let json = await fetchData.json();
         AllFolders.value.push(json.data);
         router.push(`/dashboard/${json.data._id}`);
+        e.target.lastElementChild.blur()
       }
     };
 

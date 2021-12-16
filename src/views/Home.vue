@@ -67,7 +67,7 @@ export default {
         password: password.value,
       };
 
-      let data = await fetch(`http://localhost:3001/api/usuarios/checkUser`, {
+      let data = await fetch("https://apiserver-todolist.herokuapp.com/api/usuarios/checkUser", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -75,7 +75,6 @@ export default {
         body: JSON.stringify(userData),
       });
       let json = await data.json();
-      console.log(json)
 
       if (data.ok) {
         user.data = json.user;

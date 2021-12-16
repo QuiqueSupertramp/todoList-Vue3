@@ -12,8 +12,8 @@
         <span>{{ AllTodoTasks.length }}</span>
       </div>
     </router-link>
+    <h3>Carpetas</h3>
     <div>
-      <h3>Carpetas</h3>
       <div
         class="folder"
         @mouseenter="mouseEnter"
@@ -33,20 +33,31 @@
           </div>
           <div class="folderItemText">
             <p>{{ folder.name }}</p>
-            <span>{{ folder.tasks.filter((task)=> task.status === false).length }}</span>
+            <span>{{
+              folder.tasks.filter((task) => task.status === false).length
+            }}</span>
           </div>
         </router-link>
         <div class="itemOptions">
-          <span
+          <i
+            class="fas fa-trash"
+            @click="deleteFolder(folder._id)"
+            title="Borrar carpeta"
+          ></i>
+          <!-- <span
             class="material-icons-outlined"
             @click="deleteFolder(folder._id)"
+            title="Borrar carpeta"
           >
-            highlight_off
-          </span>
+            delete
+          </span> -->
         </div>
       </div>
     </div>
     <input-folder />
+    <div class="folderListEmpty" v-if="AllFolders.length == 0">
+      <p>Agrega tu primera carpeta</p>
+    </div>
   </div>
 </template>
 
@@ -65,22 +76,21 @@ export default {
     let getUser = inject("getUser");
 
     let deleteFolder = async (folder) => {
-      let folderId = router.currentRoute.value.params.idFolder
-
-      console.log(folderId);
+      let folderId = router.currentRoute.value.params.idFolder;
 
       let r = confirm("Quieres borrar esta carpeta?");
       if (r) {
-        let data = await fetch(`http://localhost:3001/api/carpetas/${folder}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        let data = await fetch(
+          `https://apiserver-todolist.herokuapp.com/api/carpetas/${folder}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         if (data.ok) {
-          console.log(data);
-          let json = await data.json();
-          console.log(json);
+          await data.json();
           await getUser();
           folder == folderId ? router.push("/dashboard/AllTasks") : null;
         }
@@ -96,12 +106,23 @@ export default {
       e.target.firstElementChild.style.backgroundColor = "inherit";
     };
 
-    return { AllFolders, AllTasks, AllTodoTasks, mouseEnter, mouseLeave, deleteFolder };
+    return {
+      AllFolders,
+      AllTasks,
+      AllTodoTasks,
+      mouseEnter,
+      mouseLeave,
+      deleteFolder,
+    };
   },
 };
 </script>
 
 <style scoped>
+span {
+  cursor: pointer;
+}
+
 a {
   color: var(--color-black);
   line-height: 1;
@@ -160,32 +181,44 @@ a.router-link-exact-active {
 .folderItemText p {
   width: 100%;
   margin: 0;
+  padding-right: 0.5rem;
+}
+
+.folderItemText p::first-letter {
+  text-transform: uppercase;
 }
 
 .folderItemText span {
   font-size: 12px;
   color: var(--color-grey);
+  width: 13px;
 }
 
 .itemOptions {
   position: absolute;
   right: 0;
-  background-color: inherit;
-  display: none;
-  padding-right: 7.5px;
-  align-items: center;
   top: 0;
   bottom: 0;
+  background-color: inherit;
+  display: none;
+  padding-right: 9.5px;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  margin: auto;
 }
 
-.itemOptions span {
+.itemOptions i {
   color: var(--color-grey);
-  font-size: 16px;
+  font-size: 12px;
   margin: 0;
+  padding: .2rem;
   background-color: #ebebeb;
+  border-radius: 50%;
 }
 
-.itemOptions span:hover {
-  color: red;
+.itemOptions i:hover {
+  color: var(--color-white);
+  background-color: #ff000077;
 }
 </style>
