@@ -51,25 +51,25 @@ export default {
       const span = document.getElementById(props.input.id).firstElementChild;
 
       if (props.input.status.active) {
-        span.classList.add("span--top");
-        span.classList.add("span--active");
         span.classList.remove("span--inactive");
         span.classList.remove("span--error");
+        span.classList.add("span--top");
+        span.classList.add("span--active");
         return;
       }
 
       if (props.modelValue.length == 0) {
         span.classList.remove("span--top");
         span.classList.remove("span--active");
-        span.classList.add("span--inactive");
         span.classList.remove("span--error");
+        span.classList.add("span--inactive");
         return;
       }
 
       if (!props.input.status.error) {
-        span.classList.add("span--inactive");
         span.classList.remove("span--active");
         span.classList.remove("span--error");
+        span.classList.add("span--inactive");
         return;
       }
 
@@ -120,14 +120,10 @@ export default {
 
     const focusOn = () => {
       props.input.status.active = true;
-      infoSpanToggle();
-      setBorderColor();
     };
 
     const focusOff = () => {
       props.input.status.active = false;
-      //   infoSpanToggle();
-      //   setBorderColor();
     };
 
     const validate = () => {
@@ -148,14 +144,6 @@ export default {
     const sendInputValue = (event) => {
       emit("update:modelValue", event.target.value);
     };
-
-    // watchEffect(() => {
-    //   if (props.input.status.error) {
-    //     console.log(`${props.input.id} esta mal`);
-    //   } else {
-    //     console.log(`${props.input.id} esta correcto`);
-    //   }
-    // });
 
     watch(props, () => {
       infoSpanToggle();
@@ -191,9 +179,8 @@ export default {
 }
 
 .dynamicInput--invalid {
-  border: 2px solid transparent;
+  border: 2px solid red;
   box-shadow: none;
-  background-color: rgb(255, 240, 240);
 }
 
 .dynamicInput__icons {
@@ -240,7 +227,6 @@ export default {
   top: -10px;
   left: 10px;
   font-size: 12px;
-  /* color: var(--color-blue); */
   padding: 0 5px;
   z-index: 1;
 }
@@ -251,16 +237,8 @@ export default {
 .span--inactive {
   color: var(--color-grey);
 }
-.span--error {
-  /* color: red; */
-}
-/* 
-#inputDiv,
-#inputEmail,
-#inputPassword,
-#inputPassword2 {
-  border: none;
-  width: 100%;
+/* .span--error {
+  color: red;
 } */
 
 input[type="submit"] {
