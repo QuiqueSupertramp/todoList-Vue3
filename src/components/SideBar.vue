@@ -13,7 +13,7 @@
       </div>
     </router-link>
     <h3>Carpetas</h3>
-    <div>
+    <div class="userFolders">
       <div
         class="folder"
         @mouseenter="mouseEnter"
@@ -36,22 +36,15 @@
             <span>{{
               folder.tasks.filter((task) => task.status === false).length
             }}</span>
+            <div class="itemOptions">
+              <i
+                class="fas fa-trash"
+                @click="deleteFolder(folder._id)"
+                title="Borrar carpeta"
+              ></i>
+            </div>
           </div>
         </router-link>
-        <div class="itemOptions">
-          <i
-            class="fas fa-trash"
-            @click="deleteFolder(folder._id)"
-            title="Borrar carpeta"
-          ></i>
-          <!-- <span
-            class="material-icons-outlined"
-            @click="deleteFolder(folder._id)"
-            title="Borrar carpeta"
-          >
-            delete
-          </span> -->
-        </div>
       </div>
     </div>
     <input-folder />
@@ -63,7 +56,7 @@
 
 <script>
 import { inject } from "vue";
-import { router, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import inputFolder from "./inputFolder.vue";
 
 export default {
@@ -74,6 +67,7 @@ export default {
     let AllTasks = inject("AllTasks");
     let AllTodoTasks = inject("AllTodoTasks");
     let getUser = inject("getUser");
+    let matchMediaDetect = inject("matchMediaDetect");
 
     let deleteFolder = async (folder) => {
       let folderId = router.currentRoute.value.params.idFolder;
@@ -98,13 +92,27 @@ export default {
     };
 
     let mouseEnter = (e) => {
-      e.target.querySelector(".itemOptions").style.display = "flex";
-      e.target.firstElementChild.style.backgroundColor = "#ebebeb";
+      if (matchMedia("(hover:hover)").matches) {
+        e.target.querySelector(".itemOptions").style.display = "flex";
+        e.target.firstElementChild.style.backgroundColor = "#ebebeb";
+      }
     };
     let mouseLeave = (e) => {
       e.target.querySelector(".itemOptions").style.display = "none";
       e.target.firstElementChild.style.backgroundColor = "inherit";
     };
+
+    // let hideMenu = (e) => {
+    //   if (matchMediaDetect) {
+    //     if (
+    //       e.target.matches("#folderForm") ||
+    //       e.target.matches("#folderForm *")
+    //     ) {
+    //       return;
+    //     }
+    //     document.querySelector(".folderList").classList.remove("showMenu");
+    //   }
+    // };
 
     return {
       AllFolders,
@@ -113,12 +121,17 @@ export default {
       mouseEnter,
       mouseLeave,
       deleteFolder,
+      // hideMenu,
     };
   },
 };
 </script>
 
 <style scoped>
+h3 {
+  margin-top: 2rem;
+}
+
 span {
   cursor: pointer;
 }
@@ -137,15 +150,64 @@ a.router-link-exact-active {
 .folderList {
   background-color: var(--color-ligthgrey);
   width: 300px;
-  height: 92vh;
+  height: calc(100% - 3rem);
   position: fixed;
-  top: 8vh;
-  left: 0;
+  top: 3rem;
+  left: -300px;
   padding: 1.8rem 1.5rem;
+  z-index: 991;
+  transition: left 0.2s ease-out;
+}
+
+.folderItemAll {
+  margin-top: 0rem;
+}
+
+.userFolders {
+  max-height: 55%;
+  overflow: auto;
+  margin-bottom: 1.5rem;
+}
+
+.userFolders::-webkit-scrollbar {
+  display: none;
+}
+
+@media screen and (orientation: landscape) and (hover: none) {
+  h3 {
+    margin-top: 1rem;
+  }
+
+  .userFolders {
+    max-height: 31%;
+    overflow: auto;
+  }
+
+  .userFolders::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (hover: hover) {
+  .folderList {
+    left: 0;
+  }
+
+  .userFolders {
+    max-height: 55%;
+    overflow: auto;
+  }
+
+  .userFolders::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.showMenu {
+  left: 0;
 }
 
 .folder {
-  position: relative;
   border-radius: 5px;
 }
 
@@ -171,6 +233,7 @@ a.router-link-exact-active {
 }
 
 .folderItemText {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -191,7 +254,7 @@ a.router-link-exact-active {
 .folderItemText span {
   font-size: 12px;
   color: var(--color-grey);
-  width: 13px;
+  margin-right: 0.5rem;
 }
 
 .itemOptions {
@@ -201,10 +264,9 @@ a.router-link-exact-active {
   bottom: 0;
   background-color: inherit;
   display: none;
-  padding-right: 9.5px;
   align-items: center;
-  width: 24px;
-  height: 24px;
+  /* width: 24px;
+  height: 24px; */
   margin: auto;
 }
 
@@ -212,13 +274,13 @@ a.router-link-exact-active {
   color: var(--color-grey);
   font-size: 12px;
   margin: 0;
-  padding: .2rem;
+  padding: 0.4rem;
   background-color: #ebebeb;
   border-radius: 50%;
 }
 
 .itemOptions i:hover {
   color: var(--color-white);
-  background-color: #ff000077;
+  background-color: var(--color-mediumred);
 }
 </style>

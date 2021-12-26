@@ -31,12 +31,15 @@ export default {
     let focusOn = (e) => {
       document.getElementById("folderForm").style.border =
         "2px solid var(--color-mediumgrey)";
+      e.target.parentElement.firstElementChild.style.backgroundColor =
+        "#ebebeb";
     };
 
     let focusOut = (e) => {
       document.getElementById("folderForm").style.border =
         "2px solid transparent";
-      e.target.parentElement.firstElementChild.style.backgroundColor = "var(--color-ligthgrey)";
+      e.target.parentElement.firstElementChild.style.backgroundColor =
+        "var(--color-ligthgrey)";
       e.target.value = "";
     };
 
@@ -44,8 +47,9 @@ export default {
       if (document.activeElement.matches(".inputNewFolderName")) {
         return;
       }
-      e.target.firstElementChild.style.backgroundColor =
-        "#ebebeb";
+      if (matchMedia("(hover:hover)").matches) {
+        e.target.firstElementChild.style.backgroundColor = "#ebebeb";
+      }
     };
 
     let mouseOut = (e) => {
@@ -61,13 +65,16 @@ export default {
         name: newFolderName.value,
         user: user.data._id,
       };
-      let fetchData = await fetch("https://apiserver-todolist.herokuapp.com/api/carpetas", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      let fetchData = await fetch(
+        "https://apiserver-todolist.herokuapp.com/api/carpetas",
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (!fetchData.ok) {
         return;
       } else {
@@ -75,7 +82,8 @@ export default {
         let json = await fetchData.json();
         AllFolders.value.push(json.data);
         router.push(`/dashboard/${json.data._id}`);
-        e.target.lastElementChild.blur()
+        e.target.lastElementChild.blur();
+        document.querySelector(".folderList").classList.remove("showMenu")
       }
     };
 
@@ -92,6 +100,7 @@ form {
   border-radius: 5px;
   border: 2px solid transparent;
 }
+
 input {
   padding: 0;
 }

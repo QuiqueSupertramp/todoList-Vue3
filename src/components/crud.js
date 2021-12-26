@@ -61,6 +61,22 @@ export const updateTask = async (taskId, body) => {
   }
 };
 
+export let addNewUser = async(body)=> {
+  try {
+    let data = await fetch(URL_Users, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    })
+    let json = await data.json()
+    return {json, data}
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 // export const comprobarLocalStorage = async () => {
 //   let userStorageId = localStorage.getItem("user");
 //   let data = {};

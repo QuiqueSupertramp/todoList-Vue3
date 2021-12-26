@@ -13,6 +13,7 @@
     </div>
     <div v-else>
       <p>No hay tareas pendientes</p>
+      <img class="notodoImg" src="@/assets/notodotasks.png" alt="">
     </div>
     <input-task v-if="currentFolder.data.name !== 'All Tasks'" />
     <div class="completedList">
@@ -108,6 +109,7 @@ export default {
   margin: 0 auto;
   max-width: 800px;
   position: relative;
+  padding-top: 5rem;
 }
 
 input {
@@ -116,5 +118,13 @@ input {
 
 .completedList {
   margin-top: 2rem;
+}
+
+.notodoImg {
+  width: 100%;
+  max-width: 350px;
+  margin: auto;
+  display: flex;
+  opacity: .8;
 }
 </style>

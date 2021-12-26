@@ -4,6 +4,7 @@
   </div>
   <nav-bar />
   <router-view />
+  <menu-button />
 </template>
 
 <script>
@@ -19,10 +20,22 @@ import { useRouter } from "vue-router";
 import { getUserById } from "./crud.js";
 
 import NavBar from "./NavBar.vue";
+import menuButton from "./menuButton.vue";
 
 export default {
-  components: { NavBar },
+  components: { NavBar, menuButton },
   async setup() {
+    let matchMediaDetect = ref(false)
+
+    if (matchMedia("(hover:hover)").matches) {
+      matchMediaDetect.value = false
+    } else {
+      matchMediaDetect.value = true
+    }
+
+    provide("matchMediaDetect", matchMediaDetect)
+
+
     const router = useRouter();
     const user = reactive({
       data: {
@@ -80,7 +93,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 999;
 }
 
 .spinner {

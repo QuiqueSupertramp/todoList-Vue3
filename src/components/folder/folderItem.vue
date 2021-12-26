@@ -12,7 +12,12 @@
       <i v-else class="fas fa-check-circle" @click="changeStatus(task)"></i>
     </span>
     <p>{{ task.name }}</p>
-    <form @submit.prevent="updateTaskName" :data-task="task._id">
+    <form
+      class="editForm"
+      @focusout="updateTaskName"
+      @submit.prevent="updateTaskName"
+      :data-task="task._id"
+    >
       <input
         type="text"
         class="editTaskInput"
@@ -26,7 +31,7 @@
       </span>
       <span class="deleteButton">
         <i
-          class="fas fa-trash"
+          class="far fa-trash-alt"
           @click="deleteTask(task._id)"
           title="Borrar tarea"
         ></i>
@@ -70,29 +75,33 @@ export default {
       e.target.parentElement.parentElement.parentElement.children[2].style.display =
         "block";
       e.target.parentElement.parentElement.parentElement.children[2].children[0].focus();
-      e.target.parentElement.parentElement.parentElement.style.border =
-        "2px solid var(--color-mediumgrey)";
+      e.target.parentElement.parentElement.parentElement.style.borderBottom =
+        "1px solid transparent";
+      e.target.parentElement.parentElement.parentElement.style.boxShadow =
+        "1px 1px 10px #0004, -1px -1px 10px #fff4";
     };
 
     let editTaskOff = (e) => {
       e.target.parentElement.nextElementSibling.children[0].style.color =
-        "var(--color-mediumgrey)";
-      e.target.parentElement.nextElementSibling.children[0].style.backgroundColor = "var(--color-white)";
+        "var(--color-mediumblue)";
+      e.target.parentElement.nextElementSibling.children[0].style.backgroundColor =
+        "var(--color-white)";
       e.target.parentElement.parentElement.children[1].style.display = "block";
       e.target.parentElement.parentElement.children[2].style.display = "none";
-      e.target.parentElement.parentElement.style.border =
-        "2px solid var(--color-white)";
       e.target.parentElement.parentElement.style.borderBottom =
         "1px solid #f0f0f0";
+      e.target.parentElement.parentElement.style.boxShadow = "none";
     };
 
     let updateTaskName = async (e) => {
-      let body = { name: e.target.firstElementChild.value };
-      let taskId = e.target.dataset.task;
-      e.target.firstElementChild.blur();
-      await updateTask(taskId, body);
-      await getUser();
-      await getCurrentFolder();
+      if (e.target.matches(".editForm")) {
+        let body = { name: e.target.firstElementChild.value };
+        let taskId = e.target.dataset.task;
+        await updateTask(taskId, body);
+        await getUser();
+        await getCurrentFolder();
+        e.target.firstElementChild.blur();
+      }
     };
 
     let mouseOnDone = (e) => {
@@ -119,18 +128,16 @@ export default {
 </script>
 
 <style scoped>
-
 .taskItem {
   min-height: 45px;
   padding: 0 0.4rem;
-  border: 2px solid var(--color-white);
+  /* border: 2px solid var(--color-white); */
   border-bottom: 1px solid #f0f0f088;
+  /* border-top: 1px solid transparent; */
   display: flex;
   align-items: center;
   border-radius: 5px;
 }
-
-
 
 i {
   font-size: 12px;
@@ -142,8 +149,7 @@ i {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: .1rem;
-  /* width: 60px; */
+  gap: 0.1rem;
 }
 
 p {
@@ -178,14 +184,10 @@ span {
 }
 
 .doneButton {
-  color: var(--color-grey)
+  color: var(--color-orange);
 }
 .doneButton i {
-  font-size: 14px;
-}
-
-.doneButton i:hover {
-  color: var(--color-orange);
+  font-size: 16px;
 }
 
 .editTaskInput {
@@ -194,16 +196,38 @@ span {
 
 .deleteButton,
 .editButton {
+  color: var(--color-mediumblue);
+}
+
+.deleteButton {
+  color: var(--color-mediumred);
+}
+
+.deleteButton,
+.editButton {
   border-radius: 50%;
 }
 
-.deleteButton:hover {
-  color: white;
-  background-color: #ff000088;
-}
+@media (hover: hover) {
+  .editButton {
+    color: var(--color-mediumblue);
+  }
 
-.editButton:hover {
-  color: white !important;
-  background-color: #0066ff88 !important;
+  .deleteButton {
+    color: red;
+  }
+  .doneButton i:hover {
+    color: var(--color-orange);
+  }
+
+  .deleteButton:hover {
+    color: white;
+    background-color: var(--color-mediumred);
+  }
+
+  .editButton:hover {
+    color: white !important;
+    background-color: var(--color-mediumblue) !important;
+  }
 }
 </style>

@@ -130,9 +130,9 @@ export default {
 
 <style scoped>
 main {
-  margin-top: 3rem;
+  padding-top: 6rem;
   margin-left: 0;
-  width: 95vw;
+  width: 95%;
   display: flex;
   justify-content: center;
   align-items: center;

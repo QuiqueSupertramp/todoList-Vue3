@@ -36,8 +36,11 @@ export default {
   align-items: center;
   padding: 0 2rem;
   background-color: var(--color-blue);
-  height: 8vh;
+  height: 3rem;
   margin-bottom: 2rem;
+  position: fixed;
+  width: 100vw;
+  z-index: 992;
 }
 
 h1 {

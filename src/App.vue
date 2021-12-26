@@ -25,6 +25,7 @@ export default {
   --color-mediumgrey: #cccccc;
   --color-ligthgrey: #f5f5f5;
   --color-orange: #F7B859;
+  --color-mediumred: #fa8383;
 }
 body {
   margin: 0;
@@ -32,7 +33,7 @@ body {
 }
 * {
   box-sizing: border-box;
-  word-break: break-all;
+  word-break: break-word;
 
 }
 h1 {
