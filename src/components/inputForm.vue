@@ -11,35 +11,34 @@
         :maxlength="input.max"
         :value="modelValue"
         @input="sendInputValue"
-        @keyup="validate"
         @focus="focusOn"
         @focusout="focusOff"
         autocomplete="off"
       />
       <div class="dynamicInput__icons">
         <i
-          v-if="!input.status.error && modelValue.length != 0"
+          v-if="!input.status.error && input.status.value.length != 0"
           class="fas fa-check dynamicInput__checkIcon"
         ></i>
         <i
-          v-if="input.status.error && modelValue.length != 0"
+          v-if="input.status.error && input.status.value.length != 0"
           class="fas fa-times dynamicInput__errorIcon"
         ></i>
       </div>
     </div>
 
     <div
-      class="dynamicInput__errorSpan"
-      id="errorSpan"
       v-if="input.status.error && modelValue.length != 0"
+      class="dynamicInput__errorSpan"
     >
-      <span>{{ input.errorMessage }}</span>
+      <span>* {{ input.errorMessage }}</span>
     </div>
   </div>
 </template>
 
 <script>
-import { watch, watchEffect, reactive } from "@vue/runtime-core";
+import { watch } from "@vue/runtime-core";
+
 export default {
   props: {
     input: Object,
@@ -47,70 +46,92 @@ export default {
   },
 
   setup(props, { emit }) {
+    //   v-model
+    const sendInputValue = (event) => {
+      emit("update:modelValue", event.target.value);
+    };
+
+    // Estilos de borde y span según estado
     const infoSpanToggle = () => {
       const span = document.getElementById(props.input.id).firstElementChild;
 
-      if (props.input.status.active) {
+      // Funcion para limpiar clases antes de agregar por estado
+      let cleanClassList = () => {
         span.classList.remove("span--inactive");
         span.classList.remove("span--error");
+        span.classList.remove("span--top");
+        span.classList.remove("span--active");
+      };
+
+      // Validación segun la condición de cada input
+      props.input.condition();
+
+      // ASIGNACIÓN DE ESTILOS SEGÚN ESTADO
+      // Si input esta activo
+      if (props.input.status.active) {
+        cleanClassList();
         span.classList.add("span--top");
         span.classList.add("span--active");
         return;
       }
 
-      if (props.modelValue.length == 0) {
-        span.classList.remove("span--top");
-        span.classList.remove("span--active");
-        span.classList.remove("span--error");
+      // Si está inactivo y no hay value
+      if (props.input.status.value.length == 0) {
+        cleanClassList();
         span.classList.add("span--inactive");
         return;
       }
 
+      // Si está inactivo y tiene errores
       if (!props.input.status.error) {
-        span.classList.remove("span--active");
-        span.classList.remove("span--error");
+        cleanClassList();
+        span.classList.add("span--top");
         span.classList.add("span--inactive");
         return;
       }
 
+      // Si está inactivo y se cumple la condición
       if (props.input.status.error) {
-        span.classList.remove("span--inactive");
-        span.classList.remove("span--active");
+        cleanClassList();
+        span.classList.add("span--top");
         span.classList.add("span--error");
         return;
       }
     };
 
     const setBorderColor = () => {
-      validate();
       const dynamicInput = document.getElementById(props.input.id);
 
+      // Validación segun la condición de cada input
+      props.input.condition();
+
+      // ASIGNACIÓN DE ESTILOS SEGÚN ESTADO
+      // Si input esta activo
       if (props.input.status.active) {
-        console.log("status");
         dynamicInput.classList.add("dynamicInput--active");
         dynamicInput.classList.remove("dynamicInput--inactive");
         dynamicInput.classList.remove("dynamicInput--invalid");
         return;
       }
 
-      if (props.modelValue.length == 0) {
-        console.log("value");
+      // Si está inactivo y no hay value
+      if (props.input.status.value.length == 0) {
         dynamicInput.classList.add("dynamicInput--inactive");
         dynamicInput.classList.remove("dynamicInput--active");
         dynamicInput.classList.remove("dynamicInput--invalid");
         return;
       }
 
+      // Si está inactivo y hay error
       if (!props.input.status.error) {
-        console.log("no error");
         dynamicInput.classList.add("dynamicInput--inactive");
         dynamicInput.classList.remove("dynamicInput--active");
         dynamicInput.classList.remove("dynamicInput--invalid");
         return;
       }
 
+      // Si está inactivo y es correcto
       if (props.input.status.error) {
-        console.log("error");
         dynamicInput.classList.add("dynamicInput--invalid");
         dynamicInput.classList.remove("dynamicInput--active");
         dynamicInput.classList.remove("dynamicInput--inactive");
@@ -118,6 +139,7 @@ export default {
       }
     };
 
+    // Manejo de estados
     const focusOn = () => {
       props.input.status.active = true;
     };
@@ -126,31 +148,17 @@ export default {
       props.input.status.active = false;
     };
 
-    const validate = () => {
-      if (props.modelValue.length == 0) {
-        props.input.status.error = false;
-        return;
-      }
-
-      let hasError = props.input.condition();
-
-      if (hasError) {
-        props.input.status.error = true;
-      } else {
-        props.input.status.error = false;
-      }
-    };
-
-    const sendInputValue = (event) => {
-      emit("update:modelValue", event.target.value);
-    };
-
+    // WATCHERS
     watch(props, () => {
+      // Estilos segun estado
       infoSpanToggle();
       setBorderColor();
+
+      // Manejo errores
+      props.input.condition();
     });
 
-    return { sendInputValue, validate, focusOn, focusOff };
+    return { sendInputValue, focusOn, focusOff };
   },
 };
 </script>
@@ -159,6 +167,7 @@ export default {
 .container {
   width: 100%;
 }
+
 .dynamicInput {
   position: relative;
   display: flex;
@@ -179,7 +188,7 @@ export default {
 }
 
 .dynamicInput--invalid {
-  border: 2px solid red;
+  border: 2px solid var(--color-mediumred);
   box-shadow: none;
 }
 
@@ -271,5 +280,7 @@ input[type="submit"] {
 .dynamicInput__errorSpan {
   color: red;
   font-size: 12px;
+  margin-top: 4px;
+  margin-left: 10px;
 }
 </style>

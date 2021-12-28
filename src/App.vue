@@ -9,9 +9,7 @@ import CommonComponent from "./components/CommonComponent.vue";
 
 export default {
   components: { CommonComponent },
-  setup() {
-
-  },
+  setup() {},
 };
 </script>
 
@@ -24,7 +22,7 @@ export default {
   --color-grey: #a1a7b6;
   --color-mediumgrey: #cccccc;
   --color-ligthgrey: #f5f5f5;
-  --color-orange: #F7B859;
+  --color-orange: #f7b859;
   --color-mediumred: #fa8383;
 }
 body {
@@ -34,7 +32,6 @@ body {
 * {
   box-sizing: border-box;
   word-break: break-word;
-
 }
 h1 {
   font-size: 1.8em;
@@ -75,6 +72,11 @@ input {
   color: var(--color-black);
 }
 
+input[type="submit"] {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
 
 .material-icons-outlined {
   font-size: 20px;

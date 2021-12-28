@@ -67,7 +67,7 @@ export default {
     let AllTasks = inject("AllTasks");
     let AllTodoTasks = inject("AllTodoTasks");
     let getUser = inject("getUser");
-    let matchMediaDetect = inject("matchMediaDetect");
+    // let matchMediaDetect = inject("matchMediaDetect");
 
     let deleteFolder = async (folder) => {
       let folderId = router.currentRoute.value.params.idFolder;

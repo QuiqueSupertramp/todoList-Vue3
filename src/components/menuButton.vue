@@ -1,20 +1,29 @@
 <template>
-  <div v-if="matchMediaDetect" class="menuButton" @click="toggleMenu">
+  <div v-if="isInside" class="menuButton" @click="toggleMenu">
     <img class="menuButton__img" src="@/assets/logo.png" alt="" />
   </div>
 </template>
 
 <script>
-import { inject } from "@vue/runtime-core";
+import { watchEffect, ref } from "@vue/runtime-core";
+import { useRouter } from "vue-router";
+import { checkRoute } from "./helpers/checkRoute.js";
+
 export default {
   setup() {
-    let matchMediaDetect = inject("matchMediaDetect");
+    let router = useRouter();
+    let isInside = ref(false);
+
     let toggleMenu = () => {
       let menu = document.querySelector(".folderList");
       menu.classList.toggle("showMenu");
     };
 
-    return { toggleMenu, matchMediaDetect };
+    watchEffect(() => {
+      checkRoute(router, "Folder", isInside);
+    });
+
+    return { toggleMenu, isInside };
   },
 };
 </script>
@@ -36,5 +45,11 @@ export default {
 
 .menuButton__img {
   width: 30px;
+}
+
+@media (hover: hover) {
+  .menuButton {
+    display: none;
+  }
 }
 </style>

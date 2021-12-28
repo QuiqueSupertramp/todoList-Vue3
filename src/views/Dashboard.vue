@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { inject, ref, provide, reactive } from "vue";
+import { ref, provide, reactive } from "vue";
 import { useRouter } from "vue-router";
 import SideBar from "../components/SideBar.vue";
 
@@ -14,7 +14,6 @@ export default {
   components: { SideBar },
 
   setup() {
-    let matchMediaDetect = inject("matchMediaDetect");
     let folderId = ref("AllTasks");
     const currentFolder = reactive({
       data: {},
@@ -25,15 +24,7 @@ export default {
     provide("folderId", folderId);
 
     let hideMenu = (e) => {
-      if (matchMediaDetect) {
-        if (
-          e.target.matches("#folderForm") ||
-          e.target.matches("#folderForm *")
-        ) {
-          return;
-        }
-        document.querySelector(".folderList").classList.remove("showMenu");
-      }
+      document.querySelector(".folderList").classList.remove("showMenu");
     };
 
     return { hideMenu };

@@ -14,7 +14,6 @@ import {
   reactive,
   watchEffect,
   computed,
-  watch,
 } from "@vue/runtime-core";
 import { useRouter } from "vue-router";
 import { getUserById } from "./crud.js";
@@ -25,18 +24,8 @@ import menuButton from "./menuButton.vue";
 export default {
   components: { NavBar, menuButton },
   async setup() {
-    let matchMediaDetect = ref(false)
-
-    if (matchMedia("(hover:hover)").matches) {
-      matchMediaDetect.value = false
-    } else {
-      matchMediaDetect.value = true
-    }
-
-    provide("matchMediaDetect", matchMediaDetect)
-
-
     const router = useRouter();
+
     const user = reactive({
       data: {
         tasks: [],
