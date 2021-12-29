@@ -104,13 +104,14 @@ export default {
 
     // let hideMenu = (e) => {
     //   if (matchMediaDetect) {
-    //     if (
-    //       e.target.matches("#folderForm") ||
-    //       e.target.matches("#folderForm *")
-    //     ) {
-    //       return;
-    //     }
+    //   if (
+    //     e.target.matches("#folderForm") ||
+    //     e.target.matches("#folderForm *")
+    //   ) {
+    //     return;
+    //   } else {
     //     document.querySelector(".folderList").classList.remove("showMenu");
+    //   }
     //   }
     // };
 

@@ -24,7 +24,14 @@ export default {
     provide("folderId", folderId);
 
     let hideMenu = (e) => {
-      document.querySelector(".folderList").classList.remove("showMenu");
+      if (
+        e.target.matches("#folderForm") ||
+        e.target.matches("#folderForm *")
+      ) {
+        return;
+      } else {
+        document.querySelector(".folderList").classList.remove("showMenu");
+      }
     };
 
     return { hideMenu };
