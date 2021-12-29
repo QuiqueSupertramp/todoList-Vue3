@@ -46,6 +46,7 @@ export default {
     let loading = ref(false);
 
     let getUser = async () => {
+      console.log("getUser");
       loading.value = true;
       let res = await getUserById();
       if (res !== undefined) {
