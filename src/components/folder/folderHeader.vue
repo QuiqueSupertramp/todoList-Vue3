@@ -1,11 +1,11 @@
 <template>
   <div class="folderHeader">
-    <h2>{{ currentFolder.data.name }}</h2>
+    <h2>{{ activeFolder.data.name }}</h2>
     <img
       src="@/assets/delete.png"
       alt="Borrar carpeta"
       title="Borrar carpeta"
-      v-if="currentFolder.data.name !== 'All Tasks'"
+      v-if="activeFolder.data.name !== 'All Tasks'"
       @click="deleteFolder"
     />
   </div>
@@ -17,28 +17,26 @@ import { useRouter } from "vue-router";
 import { deleteFolderById } from "../crud.js";
 
 export default {
-  props: {
-    name: {
-      type: String,
-      default: "All Tasks",
-    },
-  },
-
   setup() {
+    // Variables
     let router = useRouter();
     let getUser = inject("getUser");
-    let currentFolder = inject("currentFolder");
+    let activeFolder = inject("activeFolder");
 
+    // FUNCIÓN PARA BORRAR CARPETA
     let deleteFolder = async () => {
+      // Confirmamos si el susuario desea borrar la carpeta
       let r = confirm("Deseas borrar esta carpeta");
+
+      // Si acepta, borramos, actualizamos usuario y redirigimos
       if (r) {
-        await deleteFolderById(currentFolder.data._id);
+        await deleteFolderById(activeFolder.data._id);
         await getUser();
         router.push("/dashboard/AllTasks");
       }
     };
 
-    return { deleteFolder, currentFolder };
+    return { deleteFolder, activeFolder };
   },
 };
 </script>
@@ -62,5 +60,6 @@ h2::first-letter {
 
 img {
   width: 24px;
+  cursor: pointer;
 }
 </style>

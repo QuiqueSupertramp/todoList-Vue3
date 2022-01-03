@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loading === true" class="loader">
+  <div v-if="loading" class="loader">
     <div class="spinner"></div>
   </div>
   <nav-bar />
@@ -17,54 +17,61 @@ import {
 } from "@vue/runtime-core";
 import { useRouter } from "vue-router";
 import { getUserById } from "./crud.js";
-
 import NavBar from "./NavBar.vue";
 import menuButton from "./menuButton.vue";
 
 export default {
   components: { NavBar, menuButton },
+
   async setup() {
     const router = useRouter();
 
+    // Creamos el modelo de User
     const user = reactive({
       data: {
-        tasks: [],
+        _id: "",
+        name: "",
+        email: "",
+        password: "",
         folders: [],
+        tasks: [],
       },
-    });
-    const AllTasks = ref([]);
-    const AllFolders = ref([]);
-    const AllTodoTasks = computed(() => {
-      return AllTasks.value.filter((task) => task.status === false);
+      AllTodoTasks: computed(() => {
+        return user.data.tasks.filter((task) => task.status == false);
+      }),
+      AllCompletedTasks: computed(() => {
+        return user.data.tasks.filter((task) => task.status == true);
+      }),
     });
 
     provide("user", user);
-    provide("AllTasks", AllTasks);
-    provide("AllFolders", AllFolders);
-    provide("AllTodoTasks", AllTodoTasks);
 
     let loading = ref(false);
+    provide("loading", loading);
 
+    // FUNCIÓN PARA OBTENER EL USUARIO
     let getUser = async () => {
-      console.log("getUser");
-      loading.value = true;
+      // Activamos loader si tarda mas de medio segundo
+      let load = setInterval(() => {
+        loading.value = true;
+      }, 500);
+      // Buscamos el usuario por Id en la base de datos
       let res = await getUserById();
+      // Si existe, lo añadimos, sino salimos
       if (res !== undefined) {
         user.data = res;
-        AllFolders.value = user.data.folders;
-        AllTasks.value = user.data.tasks;
         loading.value = false;
+        clearInterval(load);
       } else {
-        user.data = "";
         loading.value = false;
+        clearInterval(load);
         router.push("/");
       }
     };
 
-    user.data ? router.push("/dashboard/AllTasks") : null;
-
     provide("getUser", getUser);
 
+    // Seguimiento del usuario
     watchEffect(async () => {
       await getUser();
     });
@@ -79,11 +86,11 @@ export default {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: #fafafabb;
+  background-color: #00000044;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 990;
 }
 
 .spinner {

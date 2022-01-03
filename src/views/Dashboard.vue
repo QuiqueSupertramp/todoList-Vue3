@@ -1,12 +1,12 @@
 <template>
-  <div class="dashboard" @click="hideMenu">
+  <div class="dashboard">
     <side-bar />
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import { ref, provide, reactive } from "vue";
+import { ref, provide, reactive, inject, computed } from "vue";
 import { useRouter } from "vue-router";
 import SideBar from "../components/SideBar.vue";
 
@@ -14,27 +14,54 @@ export default {
   components: { SideBar },
 
   setup() {
+    // Variables
+    let router = useRouter();
     let folderId = ref("AllTasks");
-    const currentFolder = reactive({
-      data: {},
-      todoTasks: [],
-      completedTasks: [],
-    });
-    provide("currentFolder", currentFolder);
-    provide("folderId", folderId);
+    let user = inject("user");
 
-    let hideMenu = (e) => {
-      if (
-        e.target.matches("#folderForm") ||
-        e.target.matches("#folderForm *")
-      ) {
-        return;
+    // Creamos objeto con datos reactivos de la carpeta que está visualizando el usuario
+    const activeFolder = reactive({
+      data: {
+        name: "AllTasks",
+        tasks: [],
+      },
+      todoTasks: computed(() => {
+        return activeFolder.data.tasks.filter((task) => task.status == false);
+      }),
+      completedTasks: computed(() => {
+        return activeFolder.data.tasks.filter((task) => task.status == true);
+      }),
+    });
+
+    provide("activeFolder", activeFolder);
+
+    // FUNCIÓN PARA OBTENER DATOS DE LA CARPETA ACTIVA
+    const getActiveFolder = () => {
+      // Obtenemos el Id de la carpeta de los parametros de la ruta
+      folderId = router.currentRoute.value.params.idFolder;
+
+      // Si es undefined, salimos
+      if (folderId === undefined) return;
+
+      // Rellenamos el objeto activeFolder
+      if (folderId === "AllTasks") {
+        activeFolder.data = {
+          name: "All Tasks",
+          tasks: user.data.tasks,
+        };
       } else {
-        document.querySelector(".folderList").classList.remove("showMenu");
+        let folder = user.data.folders.find((item) => item._id == folderId);
+        if (folder) {
+          activeFolder.data = {
+            name: folder.name,
+            tasks: folder.tasks,
+            _id: folder._id,
+          };
+        }
       }
     };
 
-    return { hideMenu };
+    provide("getActiveFolder", getActiveFolder);
   },
 };
 </script>

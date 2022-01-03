@@ -3,8 +3,8 @@
     <span class="doneButton">
       <i
         class="far fa-circle"
-        @mouseleave="mouseOffDone"
-        @mouseenter="mouseOnDone"
+        @mouseleave="mouseOff"
+        @mouseenter="mouseOn"
         @click="changeStatus(task)"
         v-if="task.status == false"
         title="Tarea completada"
@@ -50,66 +50,70 @@ export default {
   },
 
   setup() {
-    let getCurrentFolder = inject("getCurrentFolder");
+    // Variables
     let getUser = inject("getUser");
 
+    // FUNCIÓN PARA BORRAR TAREA
     let deleteTask = async (taskId) => {
       await deleteTaskById(taskId);
       await getUser();
-      await getCurrentFolder();
     };
 
+    // FUNCIÓN PARA CAMBIAR ESTADO DE LA TAREA
     let changeStatus = async (task) => {
       let body = { status: task.status };
       task.status === false ? (body.status = true) : (body.status = false);
       await updateTask(task._id, body);
       await getUser();
-      await getCurrentFolder();
     };
 
-    let editTaskOn = (e) => {
-      e.target.parentElement.style.color = "var(--color-white)";
-      e.target.parentElement.style.backgroundColor = "#0066ff88";
-      e.target.parentElement.parentElement.parentElement.children[1].style.display =
-        "none";
-      e.target.parentElement.parentElement.parentElement.children[2].style.display =
-        "block";
-      e.target.parentElement.parentElement.parentElement.children[2].children[0].focus();
-      e.target.parentElement.parentElement.parentElement.style.borderBottom =
-        "1px solid transparent";
-      e.target.parentElement.parentElement.parentElement.style.boxShadow =
-        "1px 1px 10px #0004, -1px -1px 10px #fff4";
-    };
-
-    let editTaskOff = (e) => {
-      e.target.parentElement.nextElementSibling.children[0].style.color =
-        "var(--color-mediumblue)";
-      e.target.parentElement.nextElementSibling.children[0].style.backgroundColor =
-        "var(--color-white)";
-      e.target.parentElement.parentElement.children[1].style.display = "block";
-      e.target.parentElement.parentElement.children[2].style.display = "none";
-      e.target.parentElement.parentElement.style.borderBottom =
-        "1px solid #f0f0f0";
-      e.target.parentElement.parentElement.style.boxShadow = "none";
-    };
-
+    // FUNCIÓN PARA EDITAR LA TAREA
     let updateTaskName = async (e) => {
       if (e.target.matches(".editForm")) {
         let body = { name: e.target.firstElementChild.value };
         let taskId = e.target.dataset.task;
         await updateTask(taskId, body);
         await getUser();
-        await getCurrentFolder();
         e.target.firstElementChild.blur();
       }
     };
 
-    let mouseOnDone = (e) => {
+    // FUNCIONES DE ESCUCHA
+    let editTaskOn = (e) => {
+      let editButton = e.target.parentElement;
+      let taskItem = e.target.parentElement.parentElement.parentElement;
+      let taskText = taskItem.children[1];
+      let editInput = taskItem.children[2];
+
+      editButton.style.color = "var(--color-white)";
+      editButton.style.backgroundColor = "#0066ff88";
+      taskText.style.display = "none";
+      editInput.style.display = "block";
+      editInput.children[0].focus();
+      taskItem.style.borderBottom = "1px solid transparent";
+      taskItem.style.boxShadow = "1px 1px 10px #0004, -1px -1px 10px #fff4";
+    };
+
+    let editTaskOff = (e) => {
+      let editButton = e.target.parentElement.nextElementSibling.children[0];
+      let taskItem = e.target.parentElement.parentElement;
+      let taskText = taskItem.children[1];
+      let editInput = taskItem.children[2];
+
+      editButton.style.color = "var(--color-mediumblue)";
+      editButton.style.backgroundColor = "var(--color-white)";
+      taskText.style.display = "block";
+      editInput.style.display = "none";
+      taskItem.style.borderBottom = "1px solid #f0f0f0";
+      taskItem.style.boxShadow = "none";
+    };
+
+    let mouseOn = (e) => {
       e.target.classList.add("fas", "fa-check-circle");
       e.target.classList.remove("far", "fa-circle");
     };
 
-    let mouseOffDone = (e) => {
+    let mouseOff = (e) => {
       e.target.classList.remove("fas", "fa-check-circle");
       e.target.classList.add("far", "fa-circle");
     };
@@ -120,8 +124,8 @@ export default {
       editTaskOn,
       editTaskOff,
       updateTaskName,
-      mouseOnDone,
-      mouseOffDone,
+      mouseOn,
+      mouseOff,
     };
   },
 };

@@ -20,14 +20,17 @@
 <script>
 import { inject, ref } from "vue";
 import { useRouter } from "vue-router";
+import { addNewFolder } from "@/components/crud.js";
+
 export default {
   setup() {
+    // Variables
     let router = useRouter();
     let user = inject("user");
-    let AllFolders = inject("AllFolders");
+    let getUser = inject("getUser");
     let newFolderName = ref("");
-    let data = "";
 
+    // FUNCIONES DE ESCUCHA
     let focusOn = (e) => {
       document.getElementById("folderForm").style.border =
         "2px solid var(--color-mediumgrey)";
@@ -60,30 +63,32 @@ export default {
         "var(--color-ligthgrey)";
     };
 
+    // FUNCIÓN PARA AÑADIR CARPETA
     let addFolder = async (e) => {
-      data = {
+      // Creamos objeto con los datos de la nueva carpeta a enviar
+      let data = {
         name: newFolderName.value,
         user: user.data._id,
       };
-      let fetchData = await fetch(
-        "https://apiserver-todolist.herokuapp.com/api/carpetas",
-        {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (!fetchData.ok) {
-        return;
-      } else {
+      // Agregamos la carpeta a la base de datos
+      let json = await addNewFolder(data);
+      // Si es correto, actualizamos usuario, enviamos a carpeta nueva y cerramos menu
+      if (json) {
         newFolderName.value = "";
-        let json = await fetchData.json();
-        AllFolders.value.push(json.data);
+        await getUser();
         router.push(`/dashboard/${json.data._id}`);
         e.target.lastElementChild.blur();
-        document.querySelector(".folderList").classList.remove("showMenu")
+        document.querySelector(".folderList").classList.remove("showMenu");
+        document
+          .getElementById("menuButtonOne")
+          .classList.remove("menuButton__line--one");
+        document
+          .getElementById("menuButtonTwo")
+          .classList.remove("menuButton__line--two");
+        document
+          .getElementById("menuButtonThree")
+          .classList.remove("menuButton__line--three");
+        document.querySelector(".menuButton").classList.remove("active");
       }
     };
 

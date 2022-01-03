@@ -1,18 +1,26 @@
 let URL_Folders = "https://apiserver-todolist.herokuapp.com/api/carpetas";
 let URL_Tasks = "https://apiserver-todolist.herokuapp.com/api/tareas";
 let URL_Users = "https://apiserver-todolist.herokuapp.com/api/usuarios";
+let URL_CheckUser =
+  "https://apiserver-todolist.herokuapp.com/api/usuarios/checkUser";
 
 export const getUserById = async () => {
   let userStorageId = localStorage.getItem("user");
   if (userStorageId) {
     try {
-      const data = await fetch(`${URL_Users}/${userStorageId}`);
-      const json = data.json();
+      let data = await fetch(`${URL_Users}/${userStorageId}`);
+      let json = data.json();
       return json;
     } catch (error) {
       console.log(error);
     }
   }
+};
+
+export const getFolderById = async (folderId) => {
+  let data = await fetch(`${URL_Folders}/${folderId}`);
+  let json = await data.json();
+  return json;
 };
 
 export const deleteFolderById = async (folderId) => {
@@ -61,29 +69,66 @@ export const updateTask = async (taskId, body) => {
   }
 };
 
-export let addNewUser = async(body)=> {
+export let addNewUser = async (body) => {
   try {
     let data = await fetch(URL_Users, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(body)
-    })
-    let json = await data.json()
-    return {json, data}
+      body: JSON.stringify(body),
+    });
+    let json = await data.json();
+    return { json, data };
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 
-// export const comprobarLocalStorage = async () => {
-//   let userStorageId = localStorage.getItem("user");
-//   let data = {};
-//   if (userStorageId) {
-//     data = await getUserById(userStorageId);
-//   } else {
-//     return (data = "");
-//   }
-//   return data;
-// };
+export const addNewFolder = async (body) => {
+  try {
+    let data = await fetch(URL_Folders, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    let json = data.json();
+    return json;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addNewTask = async (body) => {
+  try {
+    let data = await fetch(URL_Tasks, {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    let json = await data.json();
+    return { data, json };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const checkUserLogin = async (body) => {
+  try {
+    let data = await fetch(URL_CheckUser, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    let json = await data.json();
+    return { data, json };
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -55,14 +55,6 @@ a {
   display: inline-block;
 }
 
-a:hover {
-  color: orange;
-}
-
-a.router-link-exact-active {
-  color: orange;
-}
-
 input {
   font-family: "Open Sans", sans-serif;
   outline: none;

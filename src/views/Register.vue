@@ -6,30 +6,36 @@
         <img src="@/assets/attention.png" alt="attention" class="attention" />
         <p></p>
       </div>
-      <input-form v-model="inputs.name.status.value" :input="inputs.name" />
-      <input-form v-model="inputs.email.status.value" :input="inputs.email" />
       <input-form
-        v-model="inputs.password.status.value"
-        :input="inputs.password"
+        v-model="registerInputs.name.status.value"
+        :input="registerInputs.name"
       />
       <input-form
-        v-model="inputs.password2.status.value"
-        :input="inputs.password2"
+        v-model="registerInputs.email.status.value"
+        :input="registerInputs.email"
+      />
+      <input-form
+        v-model="registerInputs.password.status.value"
+        :input="registerInputs.password"
+      />
+      <input-form
+        v-model="registerInputs.password2.status.value"
+        :input="registerInputs.password2"
       />
       <div class="buttons">
         <router-link to="/" class="link-login">Ya tengo una cuenta</router-link>
         <input type="submit" value="Registrarse" />
       </div>
-      <div id="registerError"></div>
     </form>
   </div>
 </template>
 
 <script>
-import { ref, inject, reactive } from "vue";
+import { inject, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { addNewUser } from "@/components/crud.js";
-import inputForm from "../components/inputForm.vue";
+import inputForm from "../components/inputs/inputForm.vue";
+import { infoRegisterInputs } from "@/components/helpers/inputsInfo.js";
 
 export default {
   components: { inputForm },
@@ -37,106 +43,16 @@ export default {
   setup() {
     // Traemos variables externas
     let router = useRouter();
-    let user = inject("user");
     let getUser = inject("getUser");
 
-    // Diseño de los objetos que forman los inputs
-    let inputs = reactive({
-      name: {
-        id: "inputName",
-        span: "Nombre",
-        status: {
-          active: false,
-          error: false,
-          value: "",
-        },
-        errorMessage: "Debes agregar un nombre (min: 3, max: 30)",
-        type: "text",
-        min: 3,
-        max: 30,
-        condition: () => {
-          if (inputs.name.status.value.length < 3) {
-            return (inputs.name.status.error = true);
-          } else {
-            return (inputs.name.status.error = false);
-          }
-        },
-      },
-      email: {
-        id: "inputEmail",
-        span: "Correo electrónico",
-        status: {
-          active: false,
-          error: false,
-          value: "",
-        },
-        errorMessage: "El formato del email es incorrecto",
-        type: "email",
-        min: 5,
-        max: 30,
-        condition: () => {
-          if (inputs.email.status.value.includes("@")) {
-            return (inputs.email.status.error = false);
-          } else {
-            return (inputs.email.status.error = true);
-          }
-        },
-      },
-      password: {
-        id: "inputPassword",
-        span: "Contraseña",
-        status: {
-          active: false,
-          error: false,
-          value: "",
-        },
-        errorMessage: "Contraseña no válida (min: 6, max: 30)",
-        type: "password",
-        min: 6,
-        max: 30,
-        condition: () => {
-          if (inputs.password.status.value === inputs.password2.status.value) {
-            inputs.password2.status.error = false;
-          } else {
-            inputs.password2.status.error = true;
-          }
-          if (inputs.password.status.value.length < 6) {
-            return (inputs.password.status.error = true);
-          } else {
-            return (inputs.password.status.error = false);
-          }
-        },
-      },
-      password2: {
-        id: "inputPassword2",
-        span: "Repite la contraseña",
-        status: {
-          active: false,
-          error: false,
-          value: "",
-        },
-        errorMessage: "Las contraseñas no coinciden",
-        type: "password",
-        min: 6,
-        max: 30,
-        condition: () => {
-          if (
-            inputs.password2.status.value.length > 5 &&
-            inputs.password.status.value === inputs.password2.status.value
-          ) {
-            return (inputs.password2.status.error = false);
-          } else {
-            return (inputs.password2.status.error = true);
-          }
-        },
-      },
-    });
+    // Hacemos reactivo el objeto importado que contiene la info de los inputs
+    let registerInputs = reactive(infoRegisterInputs);
 
     // FUNCION: Registro de usuario
     let registerUser = async () => {
       let error = document.querySelector(".submitError");
       let errorText = document.querySelector(".submitError").lastElementChild;
-      let arrayInputs = Object.values(inputs);
+      let arrayInputs = Object.values(registerInputs);
       var validation = false;
 
       // Comprobamos que ningún input tenga error ni esté vacío
@@ -149,29 +65,32 @@ export default {
         }
       });
 
+      // Si hay algún error, salimos de la función
       if (!validation) return;
 
-      // Construimos nuevo usuario
+      // Construimos objeto con los datos que ha introducido el usuario
       let newUser = {
-        name: inputs.name.status.value,
-        email: inputs.email.status.value,
-        password: inputs.password.status.value,
+        name: registerInputs.name.status.value,
+        email: registerInputs.email.status.value,
+        password: registerInputs.password.status.value,
       };
 
       // Enviamos POST a la base de datos
       try {
+        // Agregamos usuario a la base de datos
         let { data, json } = await addNewUser(newUser);
 
+        // Si hay error, mostramos mensaje
         if (!data.ok) {
           error.classList.remove("off");
           errorText.innerHTML = json.message;
           return;
         }
 
+        // Si es correcto, entramos
         if (data.status === 201) {
-          user.value = json.newUser;
-          localStorage.setItem("user", user.value._id);
-          getUser();
+          localStorage.setItem("user", json.newUser._id);
+          await getUser();
           router.push(`/dashboard/AllTasks`);
         }
       } catch (error) {
@@ -180,7 +99,7 @@ export default {
       }
     };
 
-    return { registerUser, inputs };
+    return { registerUser, registerInputs };
   },
 };
 </script>
@@ -209,10 +128,6 @@ form h3 {
   text-align: center;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-}
-
-#registerError {
-  color: red;
 }
 
 .submitError {
@@ -258,14 +173,24 @@ input[type="submit"] {
   color: var(--color-blue);
 }
 
-.link-login:hover {
-  text-decoration: underline;
-}
-
 @media screen and (max-width: 500px) {
   form {
-    width: 100vw;
+    width: 100%;
     box-shadow: none;
+  }
+
+  form h3 {
+    font-size: 2.2em;
+  }
+}
+
+@media (hover: hover) {
+  .link-login:hover {
+    text-decoration: underline;
+  }
+
+  input[type="submit"]:hover {
+    box-shadow: 0 0 10px var(--color-mediumblue);
   }
 }
 </style>

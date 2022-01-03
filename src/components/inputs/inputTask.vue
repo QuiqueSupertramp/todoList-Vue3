@@ -1,5 +1,10 @@
 <template>
-  <form @submit.prevent="addTask" id="taskForm" @mouseenter="mouseOn" @mouseleave="mouseOut">
+  <form
+    @submit.prevent="addTask"
+    id="taskForm"
+    @mouseenter="mouseOn"
+    @mouseleave="mouseOut"
+  >
     <input class="inputIcon" type="submit" value="+" />
     <input
       type="text"
@@ -13,23 +18,21 @@
 </template>
 
 <script>
-import { ref, inject, watchEffect, watch } from "vue";
-import { useRouter } from "vue-router";
+import { ref, inject } from "vue";
+import { addNewTask } from "@/components/crud.js";
+
 export default {
   setup() {
-    let router = useRouter();
+    // Variables
     let newTaskName = ref("");
     let user = inject("user");
-    let folderId = inject("folderId");
-    const AllTasks = inject("AllTasks");
-    let AllFolders = inject("AllFolders");
-    let todoTasks = inject("todoTasks");
-    const currentFolder = inject("currentFolder");
+    const activeFolder = inject("activeFolder");
     const getUser = inject("getUser");
 
+    // FUNCIONES DE ESCUCHA
     let focusOn = (e) => {
       document.getElementById("taskForm").style.border =
-        "2px solid var(--color-mediumgrey)";      
+        "2px solid var(--color-mediumgrey)";
     };
 
     let focusOut = (e) => {
@@ -52,35 +55,25 @@ export default {
       e.target.firstElementChild.style.backgroundColor = "var(--color-white)";
     };
 
+    // FUNCIÓN DE AGREGAR TAREA
     let addTask = async (e) => {
-      let data = {
+      // Creamos objeto con los datos de la nueva tarea
+      let body = {
         name: newTaskName.value,
-        folder: currentFolder.data._id,
+        folder: activeFolder.data._id,
         user: user.data._id,
       };
 
-      let fetchData = await fetch("https://apiserver-todolist.herokuapp.com/api/tareas", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      let json = await fetchData.json();
+      // Añadimos tarea a la base de datos
+      let { data } = await addNewTask(body);
 
-      if (fetchData.ok) {
-        AllTasks.value.push(json);
-        currentFolder.todoTasks.push(json);
-        currentFolder.data.tasks.push(json);
+      // Si es correcto, limpiamos y actualizamos usuario
+      if (data.ok) {
         newTaskName.value = "";
-        e.target.lastElementChild.blur()
+        e.target.lastElementChild.blur();
         await getUser();
       }
     };
-
-    // watchEffect(() => {
-    //   folderId = router.currentRoute.value.params.idFolder;
-    // });
 
     return { newTaskName, addTask, mouseOn, mouseOut, focusOn, focusOut };
   },

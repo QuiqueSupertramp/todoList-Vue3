@@ -6,7 +6,7 @@
       <router-link to="/register" class="btn-try-free"
         >Pruebalo gratis!</router-link
       >
-      <img src="@/assets/todos.jpg" alt="" class="img-todos" />
+      <img src="@/assets/app.png" alt="mockapp" class="img-todos" />
     </div>
     <form @submit.prevent="loginUser">
       <h3>Iniciar sesión</h3>
@@ -34,9 +34,11 @@
 </template>
 
 <script>
-import { ref, inject, onMounted, watchEffect, reactive } from "vue";
+import { inject, reactive } from "vue";
 import { useRouter } from "vue-router";
-import InputForm from "../components/inputForm.vue";
+import InputForm from "../components/inputs/inputForm.vue";
+import { checkUserLogin } from "../components/crud.js";
+import { infoLoginInputs } from "@/components/helpers/inputsInfo.js";
 
 export default {
   components: {
@@ -44,88 +46,37 @@ export default {
   },
   setup() {
     let router = useRouter();
-    let user = inject("user");
     let getUser = inject("getUser");
 
-    let loginInputs = reactive({
-      email: {
-        id: "LoginInputEmail",
-        span: "Correo electrónico",
-        status: {
-          active: false,
-          error: false,
-          value: "",
-        },
-        errorMessage: "El formato del email es incorrecto",
-        type: "email",
-        min: 5,
-        max: 30,
-        condition: () => {
-          if (loginInputs.email.status.value.includes("@")) {
-            return (loginInputs.email.status.error = false);
-          } else {
-            return (loginInputs.email.status.error = true);
-          }
-        },
-      },
-      password: {
-        id: "LoginInputPassword",
-        span: "Contraseña",
-        status: {
-          active: false,
-          error: false,
-          value: "",
-        },
-        errorMessage: "Contraseña no válida (min: 6, max: 30)",
-        type: "password",
-        min: 6,
-        max: 30,
-        condition: () => {
-          if (loginInputs.password.status.value.length < 6) {
-            return (loginInputs.password.status.error = true);
-          } else {
-            return (loginInputs.password.status.error = false);
-          }
-        },
-      },
-    });
+    // Hacemos reactivo el objeto importado que contiene la info de los inputs
+    let loginInputs = reactive(infoLoginInputs);
 
+    // FUNCIÓN PARA LOGEARSE
     let loginUser = async () => {
+      // Variables
       let loginError = document.querySelector(".loginError");
 
+      // Creamos objeto con los datos que introduce el usuario
       let userData = {
         email: loginInputs.email.status.value,
         password: loginInputs.password.status.value,
       };
 
-      let data = await fetch(
-        "https://apiserver-todolist.herokuapp.com/api/usuarios/checkUser",
-        {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify(userData),
-        }
-      );
-      let json = await data.json();
+      // Comprobamos si el login es correcto
+      let { data, json } = await checkUserLogin(userData);
 
+      // Si es correcto entramos, sino mostramos mensaje de error del backend
       if (data.ok) {
-        user.data = json.user;
-        localStorage.setItem("user", user.data._id);
-        getUser();
+        localStorage.setItem("user", json.user._id);
+        await getUser();
+        loginInputs.email.status.value = "";
+        loginInputs.password.status.value = "";
+        router.push("/dashboard/AllTasks");
       } else {
-        console.log(data);
-        user.data = "";
         loginError.classList.remove("off");
         loginError.lastElementChild.innerText = json.msg;
       }
     };
-
-    watchEffect(() => {
-      // user.data == '' ? router.push("/") : router.push('/dashboard/AllTasks')
-      user.data ? router.push("/dashboard/AllTasks") : null;
-    });
 
     return { loginUser, loginInputs };
   },
@@ -164,12 +115,6 @@ main {
   border-radius: 5px;
   padding: 5px 15px;
 }
-.btn-try-free:hover {
-  background-color: var(--color-orange);
-  color: var(--color-black);
-  border-radius: 5px;
-  padding: 5px 15px;
-}
 
 .img-todos {
   width: 80%;
@@ -197,9 +142,9 @@ form h3 {
 }
 
 .loginError {
-  padding: 0 15px;
+  padding: 5px 15px;
   margin-bottom: 1rem;
-  width: 90%;
+  width: 100%;
   background-color: #ff0000;
   border-radius: 5px;
   color: var(--color-white);
@@ -225,19 +170,9 @@ input[type="submit"] {
   width: 100%;
 }
 
-input[type="submit"]:hover {
-  /* background-color: var(--color-orange);
-  color: var(--color-dark); */
-  box-shadow: 0 0 10px var(--color-mediumblue);
-}
-
 .link-register {
   color: var(--color-blue);
   padding: 0;
-}
-
-.link-register:hover {
-  text-decoration: underline;
 }
 
 @media screen and (max-width: 992px) {
@@ -249,7 +184,7 @@ input[type="submit"]:hover {
 @media screen and (max-width: 750px) {
   main {
     flex-direction: column;
-    padding: 6rem 0 3rem;
+    padding: 5rem 0 3rem;
     gap: 2vh;
   }
 
@@ -257,8 +192,33 @@ input[type="submit"]:hover {
     align-items: center;
   }
 
+  .img-todos {
+    margin-top: 1.5rem;
+  }
+
   form {
     box-shadow: none;
+  }
+
+  form h3 {
+    font-size: 2.2em;
+  }
+}
+
+@media (hover: hover) {
+  .btn-try-free:hover {
+    background-color: var(--color-orange);
+    color: var(--color-black);
+    border-radius: 5px;
+    padding: 5px 15px;
+  }
+
+  .link-register:hover {
+    text-decoration: underline;
+  }
+
+  input[type="submit"]:hover {
+    box-shadow: 0 0 10px var(--color-mediumblue);
   }
 }
 </style>

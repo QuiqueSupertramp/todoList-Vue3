@@ -1,11 +1,11 @@
 <template>
   <nav class="nav">
     <router-link class="title" to="/"><h1>TODO LIST</h1></router-link>
-    <div class="nav-links" v-show="!user.data.name && !isInside2">
+    <div class="nav-links" v-show="!data.name && !isInside2">
       <router-link to="/register" class="btn-register">Registrarse</router-link>
     </div>
-    <div v-show="user.data.name" class="nav-links">
-      <p>Hola {{ user.data.name }}!</p>
+    <div v-if="data.name" class="nav-links">
+      <p>Hola {{ data.name }}!</p>
       <span class="material-icons-outlined logout" @click="logout">
         logout
       </span>
@@ -14,26 +14,33 @@
 </template>
 
 <script>
-import { inject, watchEffect, ref } from "vue";
+import { inject, watchEffect, ref, toRefs } from "vue";
 import { checkRoute } from "@/components/helpers/checkRoute.js";
 import { useRouter } from "vue-router";
 export default {
   setup() {
+    // Variables
     let user = inject("user");
     let getUser = inject("getUser");
     let router = useRouter();
     let isInside2 = ref(false);
 
+    // FUNCIÓN PARA CERRAR SESIÓN
     let logout = () => {
+      // Confirmamos que el usuario desea salir
       let r = confirm("seguro que quieres salir?");
       r ? (localStorage.removeItem("user"), getUser()) : null;
     };
 
+    // Seguimiento para saber si estamos dentro o no
     watchEffect(() => {
       checkRoute(router, "Register", isInside2);
     });
 
-    return { user, logout, isInside2 };
+    // Extraemos los datos de user que pasaremos al template
+    const { data } = toRefs(user);
+
+    return { data, logout, isInside2 };
   },
 };
 </script>
@@ -48,8 +55,14 @@ export default {
   height: 3rem;
   margin-bottom: 2rem;
   position: fixed;
-  width: 100vw;
+  width: 100%;
   z-index: 992;
+}
+
+@media screen and (max-width: 600px) {
+  .nav {
+    padding: 0 1rem;
+  }
 }
 
 h1 {
@@ -79,10 +92,11 @@ h1 {
 }
 
 .nav-links p {
-  font-weight: bold;
+  text-transform: capitalize;
 }
 
 .logout {
   color: var(--color-white);
+  cursor: pointer;
 }
 </style>

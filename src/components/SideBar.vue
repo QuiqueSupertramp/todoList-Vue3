@@ -18,7 +18,7 @@
         class="folder"
         @mouseenter="mouseEnter"
         @mouseleave="mouseLeave"
-        v-for="(folder, index) in AllFolders"
+        v-for="(folder, index) in data.folders"
         :key="index"
       >
         <router-link
@@ -47,50 +47,48 @@
         </router-link>
       </div>
     </div>
-    <input-folder />
-    <div class="folderListEmpty" v-if="AllFolders.length == 0">
-      <p>Agrega tu primera carpeta</p>
+    <div class="folderListEmpty" v-if="data.folders.length == 0">
+      <p>Agrega tu primera carpeta 🡳</p>
     </div>
+    <input-folder />
   </div>
 </template>
 
 <script>
-import { inject } from "vue";
+import { inject, toRefs } from "vue";
 import { useRouter } from "vue-router";
-import inputFolder from "./inputFolder.vue";
+import inputFolder from "@/components/inputs/inputFolder.vue";
+import { deleteFolderById } from "./crud";
 
 export default {
   components: { inputFolder },
   setup() {
+    // Variables
     let router = useRouter();
-    let AllFolders = inject("AllFolders");
-    let AllTasks = inject("AllTasks");
-    let AllTodoTasks = inject("AllTodoTasks");
     let getUser = inject("getUser");
-    // let matchMediaDetect = inject("matchMediaDetect");
+    let user = inject("user");
 
+    // FUNCION PARA BORRAR CARPETA
     let deleteFolder = async (folder) => {
+      // Obtenemos el id de la carpeta de la ruta atual
       let folderId = router.currentRoute.value.params.idFolder;
 
+      // Confirmamos que el usuario desea borrar la carpeta
       let r = confirm("Quieres borrar esta carpeta?");
+
+      // Si acepta, borramos
       if (r) {
-        let data = await fetch(
-          `https://apiserver-todolist.herokuapp.com/api/carpetas/${folder}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (data.ok) {
-          await data.json();
-          await getUser();
-          folder == folderId ? router.push("/dashboard/AllTasks") : null;
-        }
+        await deleteFolderById(folder);
+
+        // Redirigimos
+        folder == folderId
+          ? router.push("/dashboard/AllTasks")
+          : router.push(`/dashboard/${folderId}`);
+        await getUser();
       }
     };
 
+    // FUNCIONES ESCUCHA PARA EL RATÓN
     let mouseEnter = (e) => {
       if (matchMedia("(hover:hover)").matches) {
         e.target.querySelector(".itemOptions").style.display = "flex";
@@ -102,27 +100,15 @@ export default {
       e.target.firstElementChild.style.backgroundColor = "inherit";
     };
 
-    // let hideMenu = (e) => {
-    //   if (matchMediaDetect) {
-    //   if (
-    //     e.target.matches("#folderForm") ||
-    //     e.target.matches("#folderForm *")
-    //   ) {
-    //     return;
-    //   } else {
-    //     document.querySelector(".folderList").classList.remove("showMenu");
-    //   }
-    //   }
-    // };
+    // Extramos los datos de user que vamos a utilizar en el template
+    const { data, AllTodoTasks } = toRefs(user);
 
     return {
-      AllFolders,
-      AllTasks,
-      AllTodoTasks,
       mouseEnter,
       mouseLeave,
       deleteFolder,
-      // hideMenu,
+      AllTodoTasks,
+      data,
     };
   },
 };
@@ -255,7 +241,8 @@ a.router-link-exact-active {
 .folderItemText span {
   font-size: 12px;
   color: var(--color-grey);
-  margin-right: 0.5rem;
+  width: 25px;
+  text-align: center;
 }
 
 .itemOptions {
