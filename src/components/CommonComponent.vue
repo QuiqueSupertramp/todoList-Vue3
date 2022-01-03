@@ -63,6 +63,14 @@ export default {
         loading.value = false;
         clearInterval(load);
       } else {
+        user.data = {
+          _id: "",
+          name: "",
+          email: "",
+          password: "",
+          folders: [],
+          tasks: [],
+        };
         loading.value = false;
         clearInterval(load);
         router.push("/");

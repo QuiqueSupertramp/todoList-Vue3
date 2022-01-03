@@ -26,10 +26,10 @@ export default {
     let isInside2 = ref(false);
 
     // FUNCIÓN PARA CERRAR SESIÓN
-    let logout = () => {
+    let logout = async () => {
       // Confirmamos que el usuario desea salir
       let r = confirm("seguro que quieres salir?");
-      r ? (localStorage.removeItem("user"), getUser()) : null;
+      r ? (localStorage.removeItem("user"), await getUser()) : null;
     };
 
     // Seguimiento para saber si estamos dentro o no
